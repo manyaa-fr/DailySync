@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DailySync | Developer Productivity</title>
+    <title>DailySync | Premium Developer Analytics</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         darkMode: 'class',
@@ -50,25 +50,19 @@
                 DEFAULT: "var(--card)",
                 foreground: "var(--card-foreground)",
               },
+              gold: {
+                DEFAULT: "#D5C49F",
+                dim: "#BFAF88",
+              }
             },
             borderRadius: {
               lg: "var(--radius)",
               md: "calc(var(--radius) - 2px)",
               sm: "calc(var(--radius) - 4px)",
             },
-            animation: {
-              'fade-in': 'fadeIn 0.5s ease-out',
-              'slide-up': 'slideUp 0.5s ease-out',
-            },
-            keyframes: {
-              fadeIn: {
-                '0%': { opacity: '0' },
-                '100%': { opacity: '1' },
-              },
-              slideUp: {
-                '0%': { transform: 'translateY(10px)', opacity: '0' },
-                '100%': { transform: 'translateY(0)', opacity: '1' },
-              }
+            backgroundImage: {
+              'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+              'hero-glow': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
             }
           }
         }
@@ -76,86 +70,86 @@
     </script>
     <style>
       :root {
-        /* Base - Light Mode (Monochrome + Warm Accent) */
-        --background: #F9FAFB;
-        --foreground: #111111;
+        /* Base - Light Mode (Warm White + Champagne) */
+        --background: #F2F1ED;
+        --foreground: #1A1A1A;
 
         --card: #FFFFFF;
-        --card-foreground: #111111;
+        --card-foreground: #1A1A1A;
 
         --popover: #FFFFFF;
-        --popover-foreground: #111111;
+        --popover-foreground: #1A1A1A;
 
-        /* Primary: Monochrome Strong (#1F1F1F) */
-        --primary: #1F1F1F;
-        --primary-foreground: #FFFFFF;
+        /* Primary: Charcoal Strong */
+        --primary: #1A1A1A;
+        --primary-foreground: #F2F1ED;
 
-        /* Secondary: Neutral Grey */
-        --secondary: #F3F4F6;
-        --secondary-foreground: #111111;
+        /* Secondary: Warm Grey */
+        --secondary: #EBEAE6;
+        --secondary-foreground: #1A1A1A;
 
-        /* Muted: Lighter Grey */
-        --muted: #F3F4F6;
-        --muted-foreground: #6B7280;
+        /* Muted: Soft Grey */
+        --muted: #EBEAE6;
+        --muted-foreground: #666666;
 
-        /* Accent: For UI elements, mostly neutral */
-        --accent: #F3F4F6;
-        --accent-foreground: #111111;
+        /* Accent: Champagne Gold */
+        --accent: #D5C49F;
+        --accent-foreground: #1A1A1A;
 
         --destructive: #EF4444;
         --destructive-foreground: #FFFFFF;
 
-        --border: #E5E7EB;
-        --input: #E5E7EB;
-        --ring: rgba(162, 125, 92, 0.2);
+        --border: #E0E0E0;
+        --input: #E0E0E0;
+        --ring: rgba(213, 196, 159, 0.4);
 
-        --radius: 0.75rem; /* Rounded-xl (12px) */
+        --radius: 1rem; /* Rounded-2xl (16px) for premium feel */
 
-        /* Chart Tokens - Warm Accent (#A27D5C) */
-        --chart-line-1: #A27D5C; 
-        --chart-line-2: #9CA3AF; 
-        --chart-fill-1: rgba(162, 125, 92, 0.15);
+        /* Chart Tokens - Gold & Charcoal */
+        --chart-line-1: #D5C49F; 
+        --chart-line-2: #888888; 
+        --chart-fill-1: rgba(213, 196, 159, 0.15);
         --chart-fill-2: rgba(0,0,0,0.02);
       }
 
       .dark {
-        /* Base - Dark Mode (Deep Graphite + Warm Accent) */
-        --background: #0F1113;
-        --foreground: #E5E7EB;
+        /* Base - Dark Mode (Deep Charcoal + Champagne) */
+        --background: #0F0F0F;
+        --foreground: #E5E5E5;
 
-        --card: #111315;
-        --card-foreground: #E5E7EB;
+        --card: #141414;
+        --card-foreground: #E5E5E5;
 
-        --popover: #111315;
-        --popover-foreground: #E5E7EB;
+        --popover: #141414;
+        --popover-foreground: #E5E5E5;
 
-        /* Primary: Monochrome White/Grey */
-        --primary: #E5E7EB;
-        --primary-foreground: #0F1113;
+        /* Primary: Warm White */
+        --primary: #E5E5E5;
+        --primary-foreground: #0F0F0F;
 
         /* Secondary: Dark Grey */
-        --secondary: #1F2123;
-        --secondary-foreground: #E5E7EB;
+        --secondary: #1F1F1F;
+        --secondary-foreground: #E5E5E5;
 
-        /* Muted: Darker Grey */
-        --muted: #1A1C1E;
-        --muted-foreground: #9CA3AF;
+        /* Muted: Deep Grey */
+        --muted: #1F1F1F;
+        --muted-foreground: #A1A1A1;
 
-        /* Accent: Dark Grey */
-        --accent: #1F2123;
-        --accent-foreground: #E5E7EB;
+        /* Accent: Champagne Gold */
+        --accent: #D5C49F;
+        --accent-foreground: #0F0F0F;
 
         --destructive: #7F1D1D;
         --destructive-foreground: #FFFFFF;
 
-        --border: #2A2C30;
-        --input: #2A2C30;
-        --ring: rgba(162, 125, 92, 0.3);
+        --border: #262626;
+        --input: #262626;
+        --ring: rgba(213, 196, 159, 0.3);
 
         /* Chart Tokens - Dark */
-        --chart-line-1: #A27D5C; 
-        --chart-line-2: #4B5563; 
-        --chart-fill-1: rgba(162, 125, 92, 0.15);
+        --chart-line-1: #D5C49F; 
+        --chart-line-2: #525252; 
+        --chart-fill-1: rgba(213, 196, 159, 0.1);
         --chart-fill-2: rgba(255,255,255,0.02);
       }
 
@@ -165,6 +159,19 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+      }
+      
+      .dark .glass-panel {
+        background: rgba(20, 20, 20, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
       }
 
       /* Custom Scrollbar */
@@ -200,10 +207,8 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
   <body>
     <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
-</body>
+  </body>
 </html>
