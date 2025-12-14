@@ -1,0 +1,5 @@
+{
+  "name": "DailySync",
+  "description": "A premium developer productivity dashboard for tracking git commits, coding time, and generating daily AI summaries.",
+  "requestFramePermissions": []
+}
