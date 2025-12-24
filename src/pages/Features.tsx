@@ -2,10 +2,10 @@ import React, { useRef, useState } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
 import {
-  Timer, Github, Brain, Target, BarChart2, Clock,
-  TrendingUp, Activity, Zap, CheckCircle2, Layout,
+  Timer, Github, Brain, Target, BarChart2,
+  TrendingUp, Activity, Zap, CheckCircle2,
   GitBranch, GitCommit, Sparkles, Command, ArrowRight,
-  Calendar, PieChart, LineChart, Users, Settings
+  Calendar, PieChart, LineChart
 } from 'lucide-react';
 import { Button, Card } from '../components/ui/UIComponents';
 
@@ -584,4 +584,3 @@ const CTASection = () => {
     </section>
   );
 };
-

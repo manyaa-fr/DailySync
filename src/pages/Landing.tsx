@@ -115,7 +115,7 @@ export default function Landing() {
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
             <NavLink to="/features" className="hover:text-foreground transition-colors">Features</NavLink>
             <a href="#demo" className="hover:text-foreground transition-colors">Demo</a>
-            <a href="#" className="hover:text-foreground transition-colors">Pricing</a>
+            <NavLink to="/pricing" className="hover:text-foreground transition-colors">Pricing</NavLink>
           </div>
 
           <div className="flex items-center gap-4">
@@ -683,17 +683,3 @@ const PremiumFeatureCard: React.FC<PremiumFeatureCardProps> = ({
     </motion.div>
   );
 };
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const FeatureCard = ({ icon: Icon, title, desc }: any) => (
-  <div className="group p-6 rounded-2xl border border-transparent hover:border-border hover:bg-secondary/30 transition-all duration-300">
-    <div className="flex items-center justify-between mb-4">
-      <div className="p-3 rounded-lg bg-background border border-border group-hover:border-[#D5C49F] transition-colors">
-        <Icon size={20} className="text-foreground group-hover:text-[#D5C49F] transition-colors" />
-      </div>
-      <ArrowRight size={16} className="text-muted-foreground opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
-    </div>
-    <h4 className="font-semibold text-lg mb-2">{title}</h4>
-    <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
-  </div>
-);
