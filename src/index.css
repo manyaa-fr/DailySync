@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===============================
+   THEME TOKENS (Light Mode)
+   =============================== */
+
+:root {
+  /* Base - Light Mode (Warm White + Champagne) */
+  --background: #f2f1ed;
+  --foreground: #1a1a1a;
+
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+
+  /* Primary */
+  --primary: #1a1a1a;
+  --primary-foreground: #f2f1ed;
+
+  /* Secondary */
+  --secondary: #ebeae6;
+  --secondary-foreground: #1a1a1a;
+
+  /* Muted */
+  --muted: #ebeae6;
+  --muted-foreground: #666666;
+
+  /* Accent */
+  --accent: #d5c49f;
+  --accent-foreground: #1a1a1a;
+
+  /* Status */
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* UI */
+  --border: #e0e0e0;
+  --input: #e0e0e0;
+  --ring: rgba(213, 196, 159, 0.4);
+
+  --radius: 1rem;
+
+  /* Charts */
+  --chart-line-1: #d5c49f;
+  --chart-line-2: #888888;
+  --chart-fill-1: rgba(213, 196, 159, 0.15);
+  --chart-fill-2: rgba(0, 0, 0, 0.02);
+}
+
+/* ===============================
+   DARK MODE
+   =============================== */
+
+.dark {
+  --background: #0f0f0f;
+  --foreground: #e5e5e5;
+
+  --card: #141414;
+  --card-foreground: #e5e5e5;
+
+  --popover: #141414;
+  --popover-foreground: #e5e5e5;
+
+  --primary: #e5e5e5;
+  --primary-foreground: #0f0f0f;
+
+  --secondary: #1f1f1f;
+  --secondary-foreground: #e5e5e5;
+
+  --muted: #1f1f1f;
+  --muted-foreground: #a1a1a1;
+
+  --accent: #d5c49f;
+  --accent-foreground: #0f0f0f;
+
+  --destructive: #7f1d1d;
+  --destructive-foreground: #ffffff;
+
+  --border: #262626;
+  --input: #262626;
+  --ring: rgba(213, 196, 159, 0.3);
+
+  --chart-line-1: #d5c49f;
+  --chart-line-2: #525252;
+  --chart-fill-1: rgba(213, 196, 159, 0.1);
+  --chart-fill-2: rgba(255, 255, 255, 0.02);
+}
+
+/* ===============================
+   BASE STYLES
+   =============================== */
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition:
+    background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===============================
+   GLASS PANEL
+   =============================== */
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+}
+
+.dark .glass-panel {
+  background: rgba(20, 20, 20, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* ===============================
+   CUSTOM SCROLLBAR
+   =============================== */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+  border-radius: 4px;
+  opacity: 0.2;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--chart-line-1);
+  opacity: 0.8;
+}
