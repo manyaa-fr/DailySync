@@ -1,9 +1,10 @@
 import React, { useRef } from 'react';
 import { NavLink } from 'react-router-dom';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { 
   ArrowRight, GitBranch, GitCommit, Sparkles, Zap, 
-  BarChart2, Clock, CheckCircle2, Layout, Github, Command
+  BarChart2, Clock, CheckCircle2, Layout, Github, Command,
+  Timer, Target, Brain, Monitor, TrendingUp, Activity
 } from 'lucide-react';
 import { Button, Badge, Card } from '../components/ui/UIComponents';
 
@@ -75,6 +76,28 @@ export default function Landing() {
   const y1 = useTransform(scrollYProgress, [0, 1], [0, 200]);
 //   const y2 = useTransform(scrollYProgress, [0, 1], [0, -150]);
 
+  // Smooth scroll for anchor links
+  React.useEffect(() => {
+    const handleAnchorClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const anchor = target.closest('a[href^="#"]');
+      if (anchor) {
+        const href = anchor.getAttribute('href');
+        if (href && href !== '#') {
+          e.preventDefault();
+          const targetId = href.substring(1);
+          const targetElement = document.getElementById(targetId);
+          if (targetElement) {
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      }
+    };
+
+    document.addEventListener('click', handleAnchorClick);
+    return () => document.removeEventListener('click', handleAnchorClick);
+  }, []);
+
 
   return (
     <div ref={containerRef} className="min-h-screen bg-background text-foreground font-sans selection:bg-[#D5C49F]/30 overflow-x-hidden">
@@ -91,7 +114,7 @@ export default function Landing() {
           
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
             <a href="#features" className="hover:text-foreground transition-colors">Features</a>
-            <NavLink to="/demo" className="hover:text-foreground transition-colors">Demo</NavLink>
+            <a href="#demo" className="hover:text-foreground transition-colors">Demo</a>
             <a href="#" className="hover:text-foreground transition-colors">Pricing</a>
           </div>
 
@@ -193,75 +216,11 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* 3. VALUE BLOCK */}
-        <section className="px-6 py-24 relative z-20">
-           <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
-              <ValueCard 
-                icon={BarChart2}
-                title="Real Developer Analytics"
-                desc="See daily commits, streaks, repo focus, and productivity rhythm."
-              />
-              <ValueCard 
-                icon={Sparkles}
-                title="AI-Powered Weekly Summary"
-                desc="Personalized insights that explain your coding week like a mentor."
-              />
-              <ValueCard 
-                icon={Github}
-                title="Zero Setup. Just Connect."
-                desc="No integrations, no configuration. Your week appears instantly."
-              />
-           </div>
-        </section>
+        {/* 3. FEATURED SECTION */}
+        <FeaturedSection />
 
-        {/* 4. DEMO PREVIEW (Slider) */}
-        <section className="py-32 overflow-hidden bg-secondary/30 border-y border-border">
-           <div className="max-w-7xl mx-auto px-6 mb-12 flex justify-between items-end">
-              <div>
-                 <h2 className="text-3xl font-semibold tracking-tight">Interactive Preview</h2>
-                 <p className="text-muted-foreground mt-2">See exactly what you get.</p>
-              </div>
-              <div className="flex gap-2">
-                 <div className="w-2 h-2 rounded-full bg-[#D5C49F]"></div>
-                 <div className="w-2 h-2 rounded-full bg-border"></div>
-                 <div className="w-2 h-2 rounded-full bg-border"></div>
-              </div>
-           </div>
-           
-           {/* Horizontal Scroll Area */}
-           <div className="flex gap-8 px-6 overflow-x-auto pb-12 snap-x snap-mandatory no-scrollbar max-w-[100vw]">
-              <div className="snap-center shrink-0 w-[70vw] md:w-[400px]">
-                 <Card variant="glass" className="h-[300px] p-6 flex items-center justify-center relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#D5C49F]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="text-center space-y-3">
-                       <GitCommit size={40} className="mx-auto text-[#D5C49F]" />
-                       <h3 className="text-lg font-bold">Commit Activity</h3>
-                       <p className="text-sm text-muted-foreground">Visualized by hour and repository.</p>
-                    </div>
-                 </Card>
-              </div>
-              <div className="snap-center shrink-0 w-[70vw] md:w-[400px]">
-                 <Card variant="glass" className="h-[300px] p-6 flex items-center justify-center relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#D5C49F]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="text-center space-y-3">
-                       <Sparkles size={40} className="mx-auto text-[#D5C49F]" />
-                       <h3 className="text-lg font-bold">AI Insights</h3>
-                       <p className="text-sm text-muted-foreground">Natural language summaries of your work.</p>
-                    </div>
-                 </Card>
-              </div>
-              <div className="snap-center shrink-0 w-[70vw] md:w-[400px]">
-                 <Card variant="glass" className="h-[300px] p-6 flex items-center justify-center relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#D5C49F]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="text-center space-y-3">
-                       <Zap size={40} className="mx-auto text-[#D5C49F]" />
-                       <h3 className="text-lg font-bold">Focus Streaks</h3>
-                       <p className="text-sm text-muted-foreground">Gamified consistency tracking.</p>
-                    </div>
-                 </Card>
-              </div>
-           </div>
-        </section>
+        {/* 4. DEMO PREVIEW SECTION */}
+        <DemoSection />
 
         {/* 5. FEATURE GRID */}
         <section id="features" className="px-6 py-32">
@@ -349,18 +308,397 @@ export default function Landing() {
   );
 }
 
+// Demo Section Component
+const DemoSection = () => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+  const handleDemoClick = () => {
+    window.location.href = '/demo';
+  };
+
+  const handleFeaturesClick = () => {
+    const featuresSection = document.getElementById('features');
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut" as const,
+      },
+    },
+  };
+
+  return (
+    <section
+      id="demo"
+      ref={ref}
+      className="relative py-32 px-6 overflow-hidden bg-secondary/20 border-y border-border"
+    >
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center"
+        >
+          {/* Left: Content */}
+          <motion.div variants={itemVariants} className="space-y-8">
+            <div>
+              <div className="inline-flex items-center justify-center mb-4">
+                <span className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+                  Product Demo
+                </span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-6">
+                See how DailySync turns work into insight
+              </h2>
+              <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
+                Experience a real-time view of your coding activity, commit patterns, and productivity metrics. 
+                Everything you need to understand your development workflow at a glance.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                size="lg"
+                variant="gold"
+                onClick={handleDemoClick}
+                className="rounded-full h-14 px-8 text-lg"
+              >
+                Try Interactive Demo
+                <ArrowRight size={18} className="ml-2" />
+              </Button>
+              <button
+                onClick={handleFeaturesClick}
+                className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors px-4"
+              >
+                View Features
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Right: Demo Preview */}
+          <motion.div
+            variants={itemVariants}
+            className="relative"
+          >
+            <DashboardPreview />
+          </motion.div>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+// Dashboard Preview Component
+const DashboardPreview = () => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut" as const,
+      },
+    },
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      whileHover={{ scale: 1.02 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className="relative"
+    >
+      <Card
+        variant="glass"
+        className="overflow-hidden border border-border/50 shadow-2xl"
+      >
+        {/* Top Bar */}
+        <div className="h-12 bg-background/80 border-b border-border/50 flex items-center justify-between px-4">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-muted-foreground/30"></div>
+            <div className="w-2 h-2 rounded-full bg-muted-foreground/30"></div>
+            <div className="w-2 h-2 rounded-full bg-muted-foreground/30"></div>
+          </div>
+          <div className="text-xs font-medium text-muted-foreground">DailySync Dashboard</div>
+          <div className="w-16"></div>
+        </div>
+
+        <div className="flex">
+          {/* Sidebar */}
+          <div className="w-16 bg-background/60 border-r border-border/50 p-3 flex flex-col gap-3">
+            {[Layout, BarChart2, Clock, Sparkles].map((Icon, i) => (
+              <motion.div
+                key={i}
+                initial="hidden"
+                animate={isInView ? "visible" : "hidden"}
+                variants={cardVariants}
+                transition={{ delay: i * 0.1 }}
+                className="w-10 h-10 rounded-lg bg-secondary/50 flex items-center justify-center border border-border/30"
+              >
+                <Icon size={18} className="text-muted-foreground" />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1 p-6 space-y-4">
+            {/* Stats Row */}
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                { label: "Today", value: "4h 32m", icon: Timer },
+                { label: "This Week", value: "28h 15m", icon: Activity },
+                { label: "Streak", value: "12 days", icon: Zap },
+              ].map((stat, i) => (
+                <motion.div
+                  key={i}
+                  initial="hidden"
+                  animate={isInView ? "visible" : "hidden"}
+                  variants={cardVariants}
+                  transition={{ delay: i * 0.1 }}
+                >
+                  <Card variant="glass" className="p-4 border border-border/30">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-muted-foreground font-medium">{stat.label}</span>
+                      <stat.icon size={14} className="text-muted-foreground" />
+                    </div>
+                    <div className="text-lg font-semibold text-foreground">{stat.value}</div>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Chart Card */}
+            <motion.div
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
+              variants={cardVariants}
+              transition={{ delay: 0.3 }}
+            >
+              <Card variant="glass" className="p-6 border border-border/30">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-semibold text-foreground">Commit Activity</h3>
+                  <TrendingUp size={16} className="text-muted-foreground" />
+                </div>
+                <div className="h-32 flex items-end gap-2">
+                  {[45, 60, 55, 75, 65, 80, 70, 85, 75, 90, 80, 88].map((height, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ height: 0 }}
+                      animate={isInView ? { height: `${height}%` } : { height: 0 }}
+                      transition={{ delay: 0.5 + i * 0.05, duration: 0.4, ease: "easeOut" }}
+                      className="flex-1 bg-accent/30 rounded-t-sm hover:bg-accent/50 transition-colors"
+                    />
+                  ))}
+                </div>
+              </Card>
+            </motion.div>
+
+            {/* Bottom Cards */}
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { title: "Top Repos", icon: Github },
+                { title: "Focus Time", icon: Clock },
+              ].map((item, i) => (
+                <motion.div
+                  key={i}
+                  initial="hidden"
+                  animate={isInView ? "visible" : "hidden"}
+                  variants={cardVariants}
+                  transition={{ delay: (i + 4) * 0.1 }}
+                >
+                  <Card variant="glass" className="p-4 border border-border/30">
+                    <div className="flex items-center gap-2 mb-3">
+                      <item.icon size={16} className="text-muted-foreground" />
+                      <h4 className="text-sm font-medium text-foreground">{item.title}</h4>
+                    </div>
+                    <div className="space-y-2">
+                      {[1, 2, 3].map((j) => (
+                        <div key={j} className="h-2 bg-secondary/50 rounded-full" />
+                      ))}
+                    </div>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Card>
+    </motion.div>
+  );
+};
+
 // --- SUBCOMPONENTS ---
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ValueCard = ({ icon: Icon, title, desc }: any) => (
-  <Card variant="glass" className="p-8 hover:-translate-y-2 transition-transform duration-300">
-    <div className="w-12 h-12 rounded-xl bg-[#D5C49F]/10 flex items-center justify-center mb-6 text-[#D5C49F]">
-      <Icon size={24} />
-    </div>
-    <h3 className="text-xl font-bold mb-3">{title}</h3>
-    <p className="text-muted-foreground leading-relaxed">{desc}</p>
-  </Card>
-);
+// Premium Featured Section Component
+const FeaturedSection = () => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+  const features = [
+    {
+      icon: Timer,
+      title: "Smart Time Tracking",
+      description: "Automatically tracks coding time with focus-aware detection. Understand your deep work patterns and optimize productivity.",
+    },
+    {
+      icon: Github,
+      title: "GitHub Integration",
+      description: "Seamless connection to your repositories. Real-time activity tracking, commit analysis, and repository insights.",
+    },
+    {
+      icon: Brain,
+      title: "AI Weekly Summary",
+      description: "Get intelligent progress insights every week. Understand your coding patterns, strengths, and areas for growth.",
+    },
+    {
+      icon: Target,
+      title: "Goal & Task Monitoring",
+      description: "Set clear objectives and track progress. Maintain accountability with visual progress indicators and milestone tracking.",
+    },
+  ];
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut" as const,
+      },
+    },
+  };
+
+  return (
+    <section 
+      ref={ref}
+      className="relative py-32 px-6 overflow-hidden"
+    >
+      {/* Subtle background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/20 to-background pointer-events-none" />
+      
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Section Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="text-center mb-16"
+        >
+          <div className="inline-flex items-center justify-center mb-4">
+            <span className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+              Why DailySync
+            </span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">
+            Built for Serious Developers
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Professional-grade analytics that help you understand and improve your coding workflow.
+          </p>
+        </motion.div>
+
+        {/* Feature Cards Grid */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          className="grid sm:grid-cols-2 gap-6 max-w-5xl mx-auto"
+        >
+          {features.map((feature, index) => (
+            <PremiumFeatureCard
+              key={index}
+              icon={feature.icon}
+              title={feature.title}
+              description={feature.description}
+              variants={cardVariants}
+            />
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+// Premium Feature Card Component
+interface PremiumFeatureCardProps {
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  title: string;
+  description: string;
+  variants: any;
+}
+
+const PremiumFeatureCard: React.FC<PremiumFeatureCardProps> = ({
+  icon: Icon,
+  title,
+  description,
+  variants,
+}) => {
+  return (
+    <motion.div
+      variants={variants}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+      className="group"
+    >
+      <Card
+        variant="glass"
+        className="h-full p-6 md:p-8 border border-border/50 hover:border-border transition-all duration-300 hover:shadow-lg"
+      >
+        {/* Icon Container */}
+        <div className="mb-6">
+          <div className="w-12 h-12 rounded-xl bg-background/80 border border-border/50 flex items-center justify-center group-hover:border-accent/30 transition-colors duration-300">
+            <Icon size={22} className="text-foreground group-hover:text-accent transition-colors duration-300" />
+          </div>
+        </div>
+
+        {/* Content */}
+        <h3 className="text-lg font-semibold text-foreground mb-3 tracking-tight">
+          {title}
+        </h3>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {description}
+        </p>
+      </Card>
+    </motion.div>
+  );
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const FeatureCard = ({ icon: Icon, title, desc }: any) => (
