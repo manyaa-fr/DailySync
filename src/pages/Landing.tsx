@@ -2,9 +2,9 @@ import React, { useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { 
-  ArrowRight, GitBranch, GitCommit, Sparkles, Zap, 
-  BarChart2, Clock, CheckCircle2, Layout, Github, Command,
-  Timer, Target, Brain, Monitor, TrendingUp, Activity
+  ArrowRight, Sparkles, Zap, 
+  BarChart2, Clock, Layout, Github, Command,
+  Timer, Target, Brain, TrendingUp, Activity
 } from 'lucide-react';
 import { Button, Badge, Card } from '../components/ui/UIComponents';
 
@@ -113,7 +113,7 @@ export default function Landing() {
           </div>
           
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-            <a href="#features" className="hover:text-foreground transition-colors">Features</a>
+            <NavLink to="/features" className="hover:text-foreground transition-colors">Features</NavLink>
             <a href="#demo" className="hover:text-foreground transition-colors">Demo</a>
             <a href="#" className="hover:text-foreground transition-colors">Pricing</a>
           </div>
@@ -222,20 +222,6 @@ export default function Landing() {
         {/* 4. DEMO PREVIEW SECTION */}
         <DemoSection />
 
-        {/* 5. FEATURE GRID */}
-        <section id="features" className="px-6 py-32">
-           <div className="max-w-7xl mx-auto">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                 <FeatureCard icon={GitBranch} title="Commit Tracking" desc="Granular history of every push." />
-                 <FeatureCard icon={Layout} title="Repo Insights" desc="Identify your most active projects." />
-                 <FeatureCard icon={Zap} title="Streak & Consistency" desc="Build a daily coding habit." />
-                 <FeatureCard icon={Clock} title="Coding Time Analytics" desc="Track deep work sessions." />
-                 <FeatureCard icon={Sparkles} title="AI Developer Summary" desc="Auto-generated weekly reports." />
-                 <FeatureCard icon={CheckCircle2} title="Pattern Detection" desc="Know your peak productive hours." />
-              </div>
-           </div>
-        </section>
-
         {/* 6. THE WHY */}
         <section className="px-6 py-24 bg-card border-y border-border">
            <div className="max-w-4xl mx-auto text-center space-y-12">
@@ -317,12 +303,9 @@ const DemoSection = () => {
     window.location.href = '/demo';
   };
 
-  const handleFeaturesClick = () => {
-    const featuresSection = document.getElementById('features');
-    if (featuresSection) {
-      featuresSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
+const handleFeaturesClick = () => {
+    window.location.href = '/features';
+};
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -661,6 +644,7 @@ interface PremiumFeatureCardProps {
   icon: React.ComponentType<{ size?: number; className?: string }>;
   title: string;
   description: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   variants: any;
 }
 
