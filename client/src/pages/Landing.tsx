@@ -7,6 +7,7 @@ import {
   Timer, Target, Brain, TrendingUp, Activity
 } from 'lucide-react';
 import { Button, Badge, Card } from '../components/ui/UIComponents';
+import { useAuth } from '../auth/useAuth';
 
 // --- MOCK COMPONENTS FOR HERO VISUALIZATION ---
 
@@ -73,6 +74,8 @@ export default function Landing() {
     offset: ["start start", "end end"],
   });
 
+const { isAuthenticated } = useAuth();
+
   const y1 = useTransform(scrollYProgress, [0, 1], [0, 200]);
 //   const y2 = useTransform(scrollYProgress, [0, 1], [0, -150]);
 
@@ -103,7 +106,7 @@ export default function Landing() {
     <div ref={containerRef} className="min-h-screen bg-background text-foreground font-sans selection:bg-[#D5C49F]/30 overflow-x-hidden">
       
       {/* 1. NAVBAR */}
-      <nav className="fixed w-full z-50 top-0 bg-background/60 backdrop-blur-xl border-b border-white/5 dark:border-white/5">
+<nav className="fixed w-full z-50 top-0 bg-background/60 backdrop-blur-xl border-b border-white/5 dark:border-white/5">
         <div className="max-w-7xl mx-auto px-6 h-[70px] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-foreground text-background flex items-center justify-center">
@@ -119,12 +122,28 @@ export default function Landing() {
           </div>
 
           <div className="flex items-center gap-4">
-            <NavLink to="/auth/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block">
-              Log in
+            {isAuthenticated ? (
+            <NavLink to="/dashboard">
+                <Button size="sm" variant="primary" className="rounded-full px-6">
+                Go to Dashboard
+                </Button>
             </NavLink>
-            <NavLink to="/auth/register">
-              <Button size="sm" variant="primary" className="rounded-full px-6">Get Started</Button>
-            </NavLink>
+            ) : (
+            <>
+                <NavLink
+                to="/auth/login"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
+                >
+                Log in
+                </NavLink>
+
+                <NavLink to="/auth/register">
+                <Button size="sm" variant="primary" className="rounded-full px-6">
+                    Get Started
+                </Button>
+                </NavLink>
+            </>
+            )}
           </div>
         </div>
       </nav>

@@ -80,7 +80,7 @@ export default function LayoutShell(){
 
 
     return(
-        <div className="min-h-screen bg-background text-foreground flex flex-col md:flex-row overflow-hidden transition-colors duration-300">
+        <div className="relative min-h-screen bg-background text-foreground flex flex-col md:flex-row overflow-hidden transition-colors duration-300">
       
         {/* Mobile Header */}
         <div className="md:hidden h-16 border-b border-border bg-background/80 backdrop-blur-md flex items-center justify-between px-4 sticky top-0 z-40">
