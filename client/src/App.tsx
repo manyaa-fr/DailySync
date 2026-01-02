@@ -6,6 +6,8 @@ import LayoutShell from "./components/LayoutShell";
 import { ThemeProvider } from "./context/ThemeProvider";
 import { BrowserRouter } from "react-router-dom";
 import PricingPage from "./pages/Pricing";
+import {Login} from "./pages/Login";
+import {Register} from "./pages/Register";
 import { axiosClient } from "./utils/axiosClient";
 
 export default function App(){
@@ -32,6 +34,8 @@ export default function App(){
                     <Route path="/features" element={<Features />} />
                     <Route path="/pricing" element={<PricingPage />} />
                     <Route path="/app" element={<LayoutShell />} />
+                    <Route path="/auth/login" element={<Login />} />
+                    <Route path="/auth/register" element={<Register />} />
                     <Route path="*" element={<Navigate to="/" replace />} />    
                 </Routes>
             </BrowserRouter>
