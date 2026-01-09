@@ -3,7 +3,7 @@ import { Navigate, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Features from "./pages/Features";
 import LayoutShell from "./components/LayoutShell";
-import { ThemeProvider } from "./context/ThemeProvider";
+import { ThemeProvider } from "./context/Theme/ThemeProvider";
 import { BrowserRouter } from "react-router-dom";
 import PricingPage from "./pages/Pricing";
 import {Login} from "./pages/Login";
