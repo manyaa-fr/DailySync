@@ -8,7 +8,9 @@ import { BrowserRouter } from "react-router-dom";
 import PricingPage from "./pages/Pricing";
 import {Login} from "./pages/Login";
 import {Register} from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
 import { axiosClient } from "./utils/axiosClient";
+import { DashboardProvider } from "./context/Dashboard/DasboardProvider";
 
 export default function App(){
 
@@ -26,6 +28,23 @@ export default function App(){
         checkServerHealth();
     }, []);
 
+    if (import.meta.env.DEV) {
+        const originalWarn = console.warn
+
+        // eslint-disable-next-line react-hooks/immutability
+        console.warn = (...args) => {
+            const message = args[0]
+            if (
+            typeof message === 'string' &&
+            message.includes('The width(') &&
+            message.includes('height(')
+            ) {
+            return
+            }
+            originalWarn(...args)
+        }
+    }
+
     return (
         <ThemeProvider>
             <BrowserRouter>
@@ -33,10 +52,21 @@ export default function App(){
                     <Route path="/" element={<Landing />} />
                     <Route path="/features" element={<Features />} />
                     <Route path="/pricing" element={<PricingPage />} />
-                    <Route path="/app" element={<LayoutShell />} />
+                    <Route path="/layout" element={<LayoutShell />} />
                     <Route path="/auth/login" element={<Login />} />
                     <Route path="/auth/register" element={<Register />} />
                     <Route path="*" element={<Navigate to="/" replace />} />    
+                    <Route path="/app" element={<LayoutShell />}>
+                    <Route
+                        path="dashboard"
+                        element={
+                        <DashboardProvider height={0} width={0}>
+                            <Dashboard />
+                        </DashboardProvider>
+                        }
+                    />
+                    <Route index element={<Navigate to="dashboard" replace />} />
+                    </Route>
                 </Routes>
             </BrowserRouter>
         </ThemeProvider>

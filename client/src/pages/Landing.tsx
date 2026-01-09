@@ -117,13 +117,13 @@ const { isAuthenticated } = useAuth();
           
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
             <NavLink to="/features" className="hover:text-foreground transition-colors">Features</NavLink>
-            <a href="#demo" className="hover:text-foreground transition-colors">Demo</a>
+            <NavLink to="/app/dashboard?demo=true" className="hover:text-foreground transition-colors">Demo</NavLink>
             <NavLink to="/pricing" className="hover:text-foreground transition-colors">Pricing</NavLink>
           </div>
 
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
-            <NavLink to="/dashboard">
+            <NavLink to="/app/dashboard">
                 <Button size="sm" variant="primary" className="rounded-full px-6">
                 Go to Dashboard
                 </Button>
@@ -180,7 +180,7 @@ const { isAuthenticated } = useAuth();
               </p>
               
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
-                <NavLink to="/demo">
+                <NavLink to="/app/dashboard?demo=true">
                   <Button size="lg" variant="gold" className="rounded-full h-14 px-8 text-lg w-full sm:w-auto">
                     Try Demo Mode <ArrowRight size={18} className="ml-2" />
                   </Button>
@@ -275,7 +275,7 @@ const { isAuthenticated } = useAuth();
                     <span className="text-muted-foreground text-2xl md:text-3xl font-light mt-4 block">One dashboard. Zero effort.</span>
                  </h2>
                  <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
-                    <NavLink to="/demo">
+                    <NavLink to="/app/dashboard?demo=true">
                        <Button size="lg" variant="gold" className="rounded-full h-14 px-10 text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1">
                           Start Demo Mode
                        </Button>
@@ -319,7 +319,7 @@ const DemoSection = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   const handleDemoClick = () => {
-    window.location.href = '/demo';
+    window.location.href = '/app/dashboard?demo=true';
   };
 
 const handleFeaturesClick = () => {

@@ -15,7 +15,7 @@ import {
     Sun,
     Moon
 } from 'lucide-react';
-import { useTheme } from "../context/useTheme";
+import { useTheme } from "../context/Theme/useTheme";
 import { DemoBanner } from "./ui/UIComponents";
 
 const SidebarContent = ({onClose, navItems }) => (
@@ -65,7 +65,7 @@ const SidebarContent = ({onClose, navItems }) => (
 );
 export default function LayoutShell(){
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const {theme, toggleTheme} = useTheme();
+    const { theme, toggleTheme } = useTheme();
     const location = useLocation();
     const isDemo = location.pathname.includes('/demo');
 
