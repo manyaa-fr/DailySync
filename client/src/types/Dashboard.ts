@@ -1,45 +1,46 @@
 export interface DashboardData {
-  metrics: {
-    weeklyCommits: number
-    codingMinutes: number
-    streakDays: number
-    aiScore: number
+  metrics?: {
+    weeklyCommits?: number
+    codingMinutes?: number
+    streakDays?: number
+    aiScore?: number
   }
 
-  weeklyActivity: {
-    name: string // Mon, Tue, etc.
-    commits: number
-    minutes: number
+  weeklyActivity?: {
+    name: string
+    commits?: number
+    minutes?: number
   }[]
 
-  github: {
-    mostActiveDay: string
-    reposTouched: number
-    recentCommits: {
+  github?: {
+    mostActiveDay?: string
+    reposTouched?: number
+    recentCommits?: {
       id: string
-      message: string
-      repo: string
-      timestamp: string
+      message?: string
+      repo?: string
+      timestamp?: string
     }[]
   }
 
-  codingTime: {
-    hourly: {
+  codingTime?: {
+    hourly?: {
       name: string
-      value: number
+      value?: number
     }[]
-    dailyAverageMinutes: number
-    mostProductiveTime: string
-    peakHourLabel: string
+    dailyAverageMinutes?: number
+    mostProductiveTime?: string
+    peakHourLabel?: string
   }
 
-  aiInsight: {
-    title: string
-    summary: string
+  aiInsight?: {
+    title?: string
+    summary?: string
   }
 
   meta: {
     source: 'demo' | 'github'
-    lastUpdated: string
+    lastUpdated?: string
+    warnings?: string[]
   }
 }
