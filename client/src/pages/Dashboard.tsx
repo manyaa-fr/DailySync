@@ -136,7 +136,14 @@ export default function Dashboard() {
              </div>
           </div>
           
-          <div  style={{ width: '100%', height: 400 }}>
+          {weeklyChartData.length === 0 ? (
+            <div className="h-[400px] w-full flex items-center justify-center">
+              <p className="text-sm text-muted-foreground">
+                No activity data available yet.
+              </p>
+            </div>
+          ) : 
+          (<div  style={{ width: '100%', height: 400 }}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={weeklyChartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                 <defs>
@@ -192,7 +199,7 @@ export default function Dashboard() {
                 />
               </AreaChart>
             </ResponsiveContainer>
-          </div>
+          </div>)}
         </Card>
       </motion.div>
 
@@ -240,7 +247,12 @@ export default function Dashboard() {
 
              {/* Recent Commits List */}
              <div className="flex-1 p-0">
-                {data.github.recentCommits.slice(0, 3).map((commit  ) => (
+                { data.github.recentCommits.length === 0 ? (
+                <p className="text-sm text-muted-foreground p-4">
+                  No recent commits available.
+                </p>
+              ) :
+                (data.github.recentCommits.slice(0, 3).map((commit  ) => (
                    <div key={commit.id} className="p-4 flex items-center gap-3 border-b border-border last:border-0 hover:bg-secondary/20 transition-colors">
                       <div className="w-2 h-2 rounded-full bg-[#A27D5C] flex-shrink-0 mt-1 self-start"></div>
                       <div className="flex-1 min-w-0">
@@ -248,7 +260,7 @@ export default function Dashboard() {
                          <p className="text-xs text-muted-foreground mt-0.5">{commit.repo} • {commit.timestamp}</p>
                       </div>
                    </div>
-                ))}
+                )))}
              </div>
           </Card>
         </motion.div>
@@ -265,6 +277,13 @@ export default function Dashboard() {
                 <Badge variant="primary">Peak: {data.codingTime.peakHourLabel}</Badge>
              </div>
 
+             {data.codingTime.hourly.length === 0 ? (
+                <div className="min-h-[200px] flex items-center justify-center">
+                  <p className="text-sm text-muted-foreground">
+                    No coding time data available.
+                  </p>
+                </div>
+              ) : (
              <div style={{flex: 1, width: '100%',height: 200}}>
                 <ResponsiveContainer width="100%" height="100%">
                    <BarChart data={data.codingTime.hourly}>
@@ -289,7 +308,7 @@ export default function Dashboard() {
                       </Bar>
                    </BarChart>
                 </ResponsiveContainer>
-             </div>
+             </div>)}
              
              <div className="mt-8 pt-6 border-t border-border grid grid-cols-2 gap-4">
                 <div>
@@ -319,16 +338,24 @@ export default function Dashboard() {
                     <Sparkles size={18} />
                     <span className="uppercase tracking-wide text-xs font-bold">This Week's AI Insight</span>
                  </div>
-                 <h3 className="text-xl font-semibold text-foreground">
-                    {data.aiInsight.title}
-                 </h3>
-                 <p className="text-muted-foreground text-base max-w-2xl leading-relaxed">
-                    {data.aiInsight.summary}
-                 </p>
+                 {data.aiInsight.title && data.aiInsight.summary ? (
+                    <>
+                      <h3 className="text-xl font-semibold text-foreground">
+                        {data.aiInsight.title}
+                      </h3>
+                      <p className="text-muted-foreground">
+                        {data.aiInsight.summary}
+                      </p>
+                      <Button className="shrink-0 gap-2 shadow-sm border-0" onClick={() => navigate('/app/aiinsight')} variant="primary">
+                          View Full Summary <ArrowUpRight size={16} />
+                      </Button>
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      AI insights will appear here once enough activity data is available.
+                    </p>
+                  )}
               </div>
-              <Button className="shrink-0 gap-2 shadow-sm border-0" onClick={() => navigate('/app/aiinsight')} variant="primary">
-                 View Full Summary <ArrowUpRight size={16} />
-              </Button>
            </div>
         </Card>
       </motion.div>

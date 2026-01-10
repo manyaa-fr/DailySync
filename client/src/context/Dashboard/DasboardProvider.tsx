@@ -33,8 +33,8 @@ function normalizeDashboardData(raw: DashboardData): Required<DashboardData> {
     },
 
     aiInsight: {
-      title: raw.aiInsight?.title ?? 'No insight available',
-      summary: raw.aiInsight?.summary ?? 'Connect GitHub to generate insights.',
+      title: raw.aiInsight?.title,
+      summary: raw.aiInsight?.summary,
     },
 
     meta: {
