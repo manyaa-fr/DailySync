@@ -1,7 +1,9 @@
 from fastapi import APIRouter, HTTPException, status
+from fastapi.responses import RedirectResponse
 from schemas.auth import RegisterRequest
 from schemas.auth import LoginRequest
 from config.db import db as MongoDB
+from config.config import settings
 from datetime import datetime
 import bcrypt
 import jwt
@@ -100,3 +102,8 @@ async def login_user(payload: LoginRequest):
         "message": "User logged in successfully",
         "token": token
     }
+
+
+@router.get("/github-login")
+async def github_login():
+    return RedirectResponse(f'https://github.com/login/oauth/authorize?client_id={settings.GITHUB_CLIENT_ID}', status_code=302)

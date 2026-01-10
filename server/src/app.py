@@ -4,6 +4,8 @@ from Routes.PublicRoute import route as PublicRoute
 from fastapi.middleware.cors import CORSMiddleware
 # Auth routes import
 from Routes.AuthRoutes import router as AuthRouter
+# Github routes import
+from Routes.GithubRoutes import router as GithubRouter
 
 app = FastAPI()
 
@@ -18,3 +20,4 @@ app.add_middleware(
 
 app.include_router(PublicRoute) 
 app.include_router(AuthRouter)
+app.include_router(GithubRouter)
