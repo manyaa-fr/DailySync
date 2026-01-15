@@ -2,12 +2,15 @@ from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from datetime import datetime
 from bson import ObjectId
+from models.GithubAccount import GitHubAccount
 
 class User(BaseModel):
     id: Optional[str] = Field(alias="_id")
     full_name: str
     email: EmailStr
     password_hash: str
+
+    github: Optional["GitHubAccount"] = None
 
     is_active: bool = True
     is_verified: bool = False
@@ -20,7 +23,3 @@ class User(BaseModel):
         json_encoders = {
             ObjectId: str
         }
-
-class LoginRequest(BaseModel):
-    email: EmailStr
-    password: str

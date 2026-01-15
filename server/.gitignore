@@ -1,0 +1,54 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Environment variables files
+.env
+src/.env
+.env.*
+.env.local
+
+# Editor directories and files
+.vscode/
+.idea/
+
+# Pytest / mypy
+.pytest_cache/
+.mypy_cache/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Databases
+*.sqlite3
+*.db
+
+# Sensitive files / keys
+*.pem
+*.key
+secrets/
+
+# Node
+node_modules/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Misc
+*.swp
