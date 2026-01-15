@@ -28,31 +28,26 @@ export const Login = () => {
     e.preventDefault();
 
     if (isLoading) return;
-    setIsLoading(true);
     
     const form = e.currentTarget;
     const email = (form.elements.namedItem('email') as HTMLInputElement).value;
     const password = (form.elements.namedItem('password') as HTMLInputElement).value;
 
     try {
-      const response = await axiosClient.post('/auth/login', {
-        email,
-        password
-      });
+      setIsLoading(true);
+
+      await axiosClient.post('/auth/login', { email, password }, {withCredentials: true});
 
       toast.success('Login successful!');
-
-      localStorage.setItem("token", response.data.token);
-
-      login(response.data.user);
-
+      login();
       navigate('/app/dashboard');
 
-    } catch (error) {
-        console.error('FULL ERROR RESPONSE:', error.response?.data);
-        toast.error(error.response?.data?.detail || 'Login failed');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error('FULL ERROR RESPONSE:', error.response?.data);
+      toast.error(error.response?.data?.detail || 'Login failed');
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
 

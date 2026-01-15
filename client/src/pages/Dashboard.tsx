@@ -79,13 +79,35 @@ const ChartTooltip = ({ active, payload, label }: any) => {
 }
 
 export default function Dashboard() {
-  const data = useDashboard();
+  const dashboard = useDashboard();
+  const navigate = useNavigate();
+
+if (dashboard.status === 'loading') {
+  return (
+    <div className="h-[60vh] flex items-center justify-center text-muted-foreground">
+      Loading dashboard…
+    </div>
+  );
+}
+
+if (dashboard.status === 'needs_github') {
+  return (
+    <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
+      <p className="text-lg font-medium">Connect your GitHub to continue</p>
+      <Button onClick={() => (window.location.href = '/api/auth/github')}>
+        Connect GitHub
+      </Button>
+    </div>
+  );
+}
+
+const data = dashboard.data;
+
   const weeklyChartData = data.weeklyActivity.map(d => ({
     name: d.name,
     value: d.commits,
     secondary: d.minutes
   }))
-  const navigate = useNavigate();
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">

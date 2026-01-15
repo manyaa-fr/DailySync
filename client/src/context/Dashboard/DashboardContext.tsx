@@ -1,5 +1,4 @@
-// context/DashboardContext.tsx
 import { createContext } from 'react'
-import { DashboardData } from '../../types/Dashboard'
+import { DashboardState } from './types'
 
-export const DashboardContext = createContext<DashboardData | null>(null)
+export const DashboardContext = createContext<DashboardState | null>(null)

@@ -69,6 +69,10 @@ const MockGraphCard = () => (
 export default function Landing() {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  async function connectGitHub() {
+    window.location.href = "http://localhost:8000/api/v1/github/login";
+  }
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
@@ -185,11 +189,11 @@ const { isAuthenticated } = useAuth();
                     Try Demo Mode <ArrowRight size={18} className="ml-2" />
                   </Button>
                 </NavLink>
-                <NavLink to="/auth/register">
-                  <Button variant="outline" size="lg" className="rounded-full h-14 px-8 text-lg gap-2 w-full sm:w-auto bg-background/50 backdrop-blur-md">
+                {/* <a href={`${import.meta.env.VITE_APP_BACKEND_URI}/auth/github-login`}> */}
+                  <Button onClick={connectGitHub} variant="outline" size="lg" className="rounded-full h-14 px-8 text-lg gap-2 w-full sm:w-auto bg-background/50 backdrop-blur-md">
                     <Github size={20} /> Connect GitHub
                   </Button>
-                </NavLink>
+                {/* </a> */}
               </div>
             </motion.div>
 
@@ -280,11 +284,11 @@ const { isAuthenticated } = useAuth();
                           Start Demo Mode
                        </Button>
                     </NavLink>
-                    <NavLink to="/auth/register">
-                       <Button variant="outline" size="lg" className="rounded-full h-14 px-10 text-lg border-foreground/20 hover:bg-foreground/5">
+                    {/* <a href={`${import.meta.env.VITE_APP_BACKEND_URI}/auth/github-login`}> */}
+                       <Button onClick={connectGitHub} variant="outline" size="lg" className="rounded-full h-14 px-10 text-lg border-foreground/20 hover:bg-foreground/5">
                           Connect GitHub
                        </Button>
-                    </NavLink>
+                    {/* </a> */}
                  </div>
                  <p className="text-xs text-muted-foreground mt-8 uppercase tracking-widest font-medium">Free for individual developers</p>
               </Card>

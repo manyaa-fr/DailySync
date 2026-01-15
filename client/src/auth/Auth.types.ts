@@ -1,5 +1,8 @@
 export type AuthContextType = {
   isAuthenticated: boolean;
-  login: (token: string) => void;
+  githubConnected: boolean;
+  isLoading: boolean;
+  login: () => void;
   logout: () => void;
+  setGithubConnected: (value: boolean) => void;
 };

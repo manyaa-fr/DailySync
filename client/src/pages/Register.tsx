@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Button, Input, Card } from '../components/ui/UIComponents';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { axiosClient } from '../utils/axiosClient';
@@ -19,38 +19,53 @@ const AuthLayout = ({ children, title, subtitle }: { children?: React.ReactNode,
 );    
 
 export const Register = () => {
-const [isHidden, setIsHidden] = React.useState(true);
-const [isLoading, setIsLoading] = React.useState(false);
+  const navigate = useNavigate();
+  const [isHidden, setIsHidden] = React.useState(true);
+  const [isLoading, setIsLoading] = React.useState(false);
 
-const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  const form = e.currentTarget;
-  try {
-    const formData = new FormData(e.currentTarget);
-    const values = Object.fromEntries(formData);
-    delete values.confirmPassword;
-    const response = await axiosClient.post('/auth/register', values);
-    const data = response.data;
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (isLoading) return;
 
-    toast.success('Registration successful! Please log in.');
+    const form = e.currentTarget;
+    const formData = new FormData(form);
 
-    localStorage.setItem("token", data.token);
+    const password = formData.get('password') as string;
+    const confirmPassword = formData.get('confirmPassword') as string;
 
-    console.log('Registration successful:', data);
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
 
-    if ( isLoading ) return;
-    setIsLoading(true);
-    setTimeout(() => {
+    const payload = {
+      email: formData.get('email'),
+      password,
+      fullName: formData.get('fullName'),
+    };
+
+    try {
+      setIsLoading(true);
+
+      await axiosClient.post('/auth/register', payload, {
+        withCredentials: true,
+      });
+
+      toast.success('Registration successful!');
+      form.reset();
+
+      setTimeout(() => {
+        navigate('/app/dashboard');
+      }, 1200);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error('FULL ERROR RESPONSE:', error.response?.data);
+      toast.error(error.response?.data?.detail || 'Registration failed');
+    } finally {
       setIsLoading(false);
-      window.location.href = '/auth/login';
-    }, 1500);
-    form.reset();
-  } catch (error) {
-    console.error('FULL ERROR RESPONSE:', error.response?.data);
-    toast.error(error.response?.data?.detail || 'Registration failed');
-    setIsLoading(false);
-  }
-};
+    }
+  };
 
 
   return (

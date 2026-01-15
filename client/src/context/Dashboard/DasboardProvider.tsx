@@ -1,62 +1,78 @@
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { DashboardContext } from './DashboardContext'
 import { DEMO_DASHBOARD_DATA } from '../../mock/demoDashboard'
 import { DemoBanner } from '../../components/ui/UIComponents'
-import { DashboardData } from '../../types/Dashboard'
+import { useAuth } from '../../auth/useAuth'
+import { DashboardState } from './types'
 
-type DashboardProviderProps = {
+export const DashboardProvider = ({
+  children,
+}: {
   children: React.ReactNode
-}
-
-function normalizeDashboardData(raw: DashboardData): Required<DashboardData> {
-  return {
-    metrics: {
-      weeklyCommits: raw.metrics?.weeklyCommits ?? 0,
-      codingMinutes: raw.metrics?.codingMinutes ?? 0,
-      streakDays: raw.metrics?.streakDays ?? 0,
-      aiScore: raw.metrics?.aiScore ?? 0,
-    },
-
-    weeklyActivity: raw.weeklyActivity ?? [],
-
-    github: {
-      mostActiveDay: raw.github?.mostActiveDay ?? 'N/A',
-      reposTouched: raw.github?.reposTouched ?? 0,
-      recentCommits: raw.github?.recentCommits ?? [],
-    },
-
-    codingTime: {
-      hourly: raw.codingTime?.hourly ?? [],
-      dailyAverageMinutes: raw.codingTime?.dailyAverageMinutes ?? 0,
-      mostProductiveTime: raw.codingTime?.mostProductiveTime ?? 'N/A',
-      peakHourLabel: raw.codingTime?.peakHourLabel ?? 'N/A',
-    },
-
-    aiInsight: {
-      title: raw.aiInsight?.title,
-      summary: raw.aiInsight?.summary,
-    },
-
-    meta: {
-      source: raw.meta.source,
-      lastUpdated: raw.meta.lastUpdated ?? '',
-      warnings: raw.meta.warnings ?? [],
-    },
-  }
-}
-
-export const DashboardProvider = ({ children }: DashboardProviderProps) => {
+}) => {
   const [params] = useSearchParams()
   const isDemo = params.get('demo') === 'true'
 
-  const data = isDemo
-    ? DEMO_DASHBOARD_DATA
-    : DEMO_DASHBOARD_DATA // real later
-  
-  const safeData = normalizeDashboardData(data)
+  // ✅ THIS NOW MATCHES YOUR AUTH CONTEXT
+  const { isAuthenticated, githubConnected } = useAuth()
+
+  const [state, setState] = useState<DashboardState>({
+    status: 'loading',
+  })
+
+  useEffect(() => {
+    // DEMO MODE (only via URL)
+    if (isDemo) {
+      setState({
+        status: 'demo',
+        data: DEMO_DASHBOARD_DATA,
+      })
+      return
+    }
+
+    // Not logged in -> dashboard shouldn't even try
+    if (!isAuthenticated) {
+      setState({ status: 'loading' })
+      return
+    }
+
+    // Logged in but GitHub not connected
+    if (!githubConnected) {
+      setState({ status: 'needs_github' })
+      return
+    }
+
+    // Logged in + GitHub connected → fetch real data
+    const fetchDashboard = async () => {
+      try {
+        setState({ status: 'loading' })
+
+        const res = await fetch('/api/dashboard', {
+          credentials: 'include',
+        })
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch dashboard')
+        }
+
+        const data = await res.json()
+
+        setState({
+          status: 'ready',
+          data,
+        })
+      } catch (err) {
+        console.error(err)
+        setState({ status: 'needs_github' })
+      }
+    }
+
+    fetchDashboard()
+  }, [isDemo, isAuthenticated, githubConnected])
 
   return (
-    <DashboardContext.Provider value={safeData}>
+    <DashboardContext.Provider value={state}>
       {isDemo && <DemoBanner />}
       {children}
     </DashboardContext.Provider>
