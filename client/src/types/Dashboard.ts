@@ -12,6 +12,12 @@ export interface DashboardData {
     minutes?: number
   }[]
 
+  codeChurn?: {
+    day: string
+    additions: number
+    deletions: number
+  }[]
+
   github?: {
     mostActiveDay?: string
     reposTouched?: number
@@ -37,6 +43,20 @@ export interface DashboardData {
     title?: string
     summary?: string
   }
+
+  languages?: {
+    name: string
+    percentage: number
+    color: string
+  }[]
+
+  primaryLanguage?: string
+
+  repos?: {
+    name: string
+    commitCount: number
+    lastActive: string
+  }[]
 
   meta: {
     source: 'demo' | 'github'
