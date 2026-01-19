@@ -10,6 +10,7 @@ pymongo
 
 bcrypt
 pyjwt
+python-jose[cryptography]
 
 httpx
 
