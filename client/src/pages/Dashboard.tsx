@@ -109,7 +109,7 @@ if (dashboard.status === 'needs_github') {
   return (
     <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
       <p className="text-lg font-medium">Connect your GitHub to continue</p>
-      <Button onClick={() => (window.location.href = 'http://localhost:8000/api/v1/github/login')}>
+      <Button onClick={() => (window.location.href = `${import.meta.env.VITE_API_URL}/github/login`)}>
         Connect GitHub
       </Button>
     </div>

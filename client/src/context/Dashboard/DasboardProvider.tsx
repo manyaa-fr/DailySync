@@ -40,7 +40,7 @@ export const DashboardProvider = ({
       try {
         setState({ status: 'loading' })
 
-        const res = await fetch('http://localhost:8000/api/v1/dashboard', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/dashboard`, {
           credentials: 'include',
         })
 

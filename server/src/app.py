@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from Routes.PublicRoute import route as PublicRoute
 # CORS error fix
@@ -11,9 +12,11 @@ from Routes.Github import router as manual_github_sync
 app = FastAPI()
 
 # Middleware to handle CORS
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"], 
+    allow_origins=allowed_origins, 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

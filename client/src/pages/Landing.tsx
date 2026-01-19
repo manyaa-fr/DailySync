@@ -70,7 +70,7 @@ export default function Landing() {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   async function connectGitHub() {
-    window.location.href = "http://localhost:8000/api/v1/github/login";
+    window.location.href = `${import.meta.env.VITE_API_URL}/github/login`;
   }
 
   const { scrollYProgress } = useScroll({
