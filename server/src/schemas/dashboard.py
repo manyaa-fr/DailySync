@@ -17,6 +17,11 @@ class WeeklyActivityItem(BaseModel):
     commits: Optional[int] = None
     minutes: Optional[int] = None
 
+class CodeChurnItem(BaseModel):
+    day: str
+    additions: int
+    deletions: int
+
 class GitHubCommit(BaseModel):
     id: str
     message: Optional[str] = None
@@ -42,10 +47,24 @@ class DashboardAIInsight(BaseModel):
     title: Optional[str] = None
     summary: Optional[str] = None
 
+class LanguageStat(BaseModel):
+    name: str
+    percentage: int
+    color: str
+
+class RepoInsight(BaseModel):
+    name: str
+    commitCount: int
+    lastActive: str
+
 class DashboardResponse(BaseModel):
     metrics: Optional[DashboardMetrics] = None
     weeklyActivity: Optional[List[WeeklyActivityItem]] = None
+    codeChurn: Optional[List[CodeChurnItem]] = None
     github: Optional[DashboardGitHub] = None
     codingTime: Optional[DashboardCodingTime] = None
     aiInsight: Optional[DashboardAIInsight] = None
+    languages: Optional[List[LanguageStat]] = None
+    primaryLanguage: Optional[str] = None
+    repos: Optional[List[RepoInsight]] = None
     meta: DashboardMeta
