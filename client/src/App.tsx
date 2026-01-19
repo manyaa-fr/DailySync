@@ -11,6 +11,7 @@ import {Register} from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import { axiosClient } from "./utils/axiosClient";
 import { DashboardProvider } from "./context/Dashboard/DasboardProvider";
+import Github from "./pages/Github";
 
 export default function App(){
 
@@ -60,8 +61,16 @@ export default function App(){
                     <Route
                         path="dashboard"
                         element={
-                        <DashboardProvider height={0} width={0}>
+                        <DashboardProvider>
                             <Dashboard />
+                        </DashboardProvider>
+                        }
+                    />
+                    <Route
+                        path="github"
+                        element={
+                        <DashboardProvider>
+                            <Github />
                         </DashboardProvider>
                         }
                     />

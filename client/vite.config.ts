@@ -14,6 +14,11 @@ export default defineConfig(
         'process.env.API_KEY': JSON.stringify(env.API_KEY),
       },
       plugins: [react()],
+      proxy: {'/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+      }},
       resolve: {
         alias: {
           '@': path.resolve(__dirname, './src'),
