@@ -52,3 +52,6 @@ htmlcov/
 
 # Misc
 *.swp
+
+__pycache__/
+*.pyc
