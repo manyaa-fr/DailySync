@@ -14,15 +14,14 @@ export const DashboardProvider = ({
   const [params] = useSearchParams()
   const isDemo = params.get('demo') === 'true'
 
-  // ✅ THIS NOW MATCHES YOUR AUTH CONTEXT
-  const { isAuthenticated, githubConnected } = useAuth()
+  const { isAuthenticated } = useAuth()
 
   const [state, setState] = useState<DashboardState>({
     status: 'loading',
   })
 
   useEffect(() => {
-    // DEMO MODE (only via URL)
+    // DEMO MODE
     if (isDemo) {
       setState({
         status: 'demo',
@@ -31,37 +30,45 @@ export const DashboardProvider = ({
       return
     }
 
-    // Not logged in -> dashboard shouldn't even try
+    // Not logged in → do nothing
     if (!isAuthenticated) {
       setState({ status: 'loading' })
       return
     }
 
-    // Logged in but GitHub not connected
-    if (!githubConnected) {
-      setState({ status: 'needs_github' })
-      return
-    }
-
-    // Logged in + GitHub connected → fetch real data
     const fetchDashboard = async () => {
       try {
         setState({ status: 'loading' })
 
-        const res = await fetch('/api/dashboard', {
+        const res = await fetch('http://localhost:8000/api/v1/dashboard', {
           credentials: 'include',
         })
+
+        const contentType = res.headers.get('content-type')
+
+        if (!contentType?.includes('application/json')) {
+          const text = await res.text()
+          console.error('NON-JSON RESPONSE:', text)
+          throw new Error('Backend did not return JSON')
+        }
+
+        const data = await res.json()
 
         if (!res.ok) {
           throw new Error('Failed to fetch dashboard')
         }
 
-        const data = await res.json()
-
-        setState({
-          status: 'ready',
-          data,
-        })
+        if (data.meta?.source === 'github') {
+          setState({
+            status: 'ready',
+            data,
+          })
+        } else {
+          setState({
+            status: 'needs_github',
+            data,
+          })
+        }
       } catch (err) {
         console.error(err)
         setState({ status: 'needs_github' })
@@ -69,7 +76,7 @@ export const DashboardProvider = ({
     }
 
     fetchDashboard()
-  }, [isDemo, isAuthenticated, githubConnected])
+  }, [isDemo, isAuthenticated])
 
   return (
     <DashboardContext.Provider value={state}>

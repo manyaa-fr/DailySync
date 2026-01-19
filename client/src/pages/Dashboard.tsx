@@ -20,14 +20,15 @@ import {
   Flame, 
   Zap, 
   ArrowUpRight, 
-  GitBranch, 
-  RefreshCw, 
+  GitBranch,  
   Sparkles
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Card, Badge, Button } from '../components/ui/UIComponents';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDashboard } from '../context/Dashboard/UseDashboard';
+import React from 'react';
+import { axiosClient } from '../utils/axiosClient';
 
 // --- Dashboard Components ---
 
@@ -82,6 +83,20 @@ export default function Dashboard() {
   const dashboard = useDashboard();
   const navigate = useNavigate();
 
+  const [refreshing, setRefreshing] = React.useState(false)
+
+  const refreshGithub = async () => {
+    try {
+      setRefreshing(true)
+      await axiosClient.post('/github/sync', {}, { withCredentials: true })
+      navigate(0)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
 if (dashboard.status === 'loading') {
   return (
     <div className="h-[60vh] flex items-center justify-center text-muted-foreground">
@@ -94,7 +109,7 @@ if (dashboard.status === 'needs_github') {
   return (
     <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
       <p className="text-lg font-medium">Connect your GitHub to continue</p>
-      <Button onClick={() => (window.location.href = '/api/auth/github')}>
+      <Button onClick={() => (window.location.href = 'http://localhost:8000/api/v1/github/login')}>
         Connect GitHub
       </Button>
     </div>
@@ -103,11 +118,47 @@ if (dashboard.status === 'needs_github') {
 
 const data = dashboard.data;
 
-  const weeklyChartData = data.weeklyActivity.map(d => ({
-    name: d.name,
-    value: d.commits,
-    secondary: d.minutes
-  }))
+const hasCommits =
+  data.metrics &&
+  data.metrics.weeklyCommits !== undefined &&
+  data.metrics.weeklyCommits > 0
+
+// if (!data || !data.metrics) {
+//   return (
+//     <div className="h-[60vh] flex items-center justify-center text-muted-foreground">
+//       No GitHub activity yet. Sync your account to see stats.
+//     </div>
+//   )
+// }
+
+if (!hasCommits) {
+  return (
+    <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
+      <p className="text-muted-foreground">
+        No GitHub activity yet. Sync your account to see stats.
+      </p>
+      <button
+        onClick={refreshGithub}
+        disabled={refreshing}
+      >
+        {refreshing ? 'Refreshing…' : 'Refresh GitHub'}
+      </button>
+    </div>
+  )
+}
+
+const metrics = data.metrics ?? {
+  weeklyCommits: 0,
+  codingMinutes: 0,
+  streakDays: 0,
+  aiScore: 0,
+}
+
+const weeklyChartData = (data.weeklyActivity ?? []).map(d => ({
+  name: d.name,
+  value: d.commits ?? 0,
+  secondary: d.minutes ?? 0,
+}))
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -116,22 +167,22 @@ const data = dashboard.data;
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard 
           title = "Weekly Commits" 
-          value = {data.metrics.weeklyCommits}
+          value = {metrics.weeklyCommits}
           icon = {GitCommit}
         />
         <MetricCard 
           title = "Coding Minutes" 
-          value = {data.metrics.codingMinutes}
+          value = {metrics.codingMinutes}
           icon = {Clock}
         />
         <MetricCard 
           title = "Day Streak" 
-          value = {data.metrics.streakDays}
+          value = {metrics.streakDays}
           icon = {Flame}
         />
         <MetricCard 
           title = "AI Score" 
-          value = {data.metrics.aiScore}
+          value = {metrics.aiScore}
           icon = {Zap}
         />
       </div>
@@ -259,10 +310,10 @@ const data = dashboard.data;
                         </LineChart>
                      </ResponsiveContainer>
                   </div>
-                  <p className="text-xs text-muted-foreground">Most Active: <span className="text-foreground font-medium">Thursday</span></p>
+                  <p className="text-xs text-muted-foreground">Most Active: <span className="text-foreground font-medium">{data.github.mostActiveDay ?? '—'}</span></p>
                 </div>
                 <div className="p-6 flex flex-col justify-center items-center">
-                   <p className="text-3xl font-bold text-foreground">4</p>
+                   <p className="text-3xl font-bold text-foreground">{data.github.reposTouched ?? 0}</p>
                    <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mt-1">Repos Touched</p>
                 </div>
              </div>
@@ -360,7 +411,7 @@ const data = dashboard.data;
                     <Sparkles size={18} />
                     <span className="uppercase tracking-wide text-xs font-bold">This Week's AI Insight</span>
                  </div>
-                 {data.aiInsight.title && data.aiInsight.summary ? (
+                 {data.aiInsight?.title && data.aiInsight?.summary ? (
                     <>
                       <h3 className="text-xl font-semibold text-foreground">
                         {data.aiInsight.title}
@@ -394,9 +445,12 @@ const data = dashboard.data;
               <Clock size={16} /> Log Coding Time
            </Button>
         </NavLink>
-        <Button variant="outline" className="gap-2 h-12">
-           <RefreshCw size={16} /> Refresh GitHub
-        </Button>
+        <button
+          onClick={refreshGithub}
+          disabled={refreshing}
+        >
+          {refreshing ? 'Refreshing…' : 'Refresh GitHub'}
+        </button>
         <NavLink to="/app/aiinsight">
            <Button variant="outline" className="gap-2 h-12">
               <Sparkles size={16} /> Generate AI Summary
