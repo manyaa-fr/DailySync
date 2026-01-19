@@ -164,6 +164,8 @@ async def login(payload: LoginRequest):
 
 @auth_router.get("/me")
 async def me(request: Request):
+    if not request.state.user_id:
+        raise HTTPException(status_code=401)
     token = request.cookies.get("access_token")
 
     if not token:
@@ -185,7 +187,7 @@ async def me(request: Request):
             detail="Invalid token",
         )
 
-    user = await users.find_one({"_id": ObjectId(user_id)})
+    user = await users.find_one({"_id": ObjectId(request.state.user_id)})
 
     if not user:
         raise HTTPException(
@@ -214,7 +216,7 @@ async def github_login():
         "https://github.com/login/oauth/authorize"
         f"?client_id={GITHUB_CLIENT_ID}"
         f"&redirect_uri={BACKEND_CALLBACK_URL}"
-        f"&scope=read:user public_repo"
+        f"&scope=read:user user:email repo"
         f"&state={state}"
     )
 
@@ -223,7 +225,7 @@ async def github_login():
 # -------------------- GITHUB CALLBACK --------------------
 
 @github_router.get("/callback")
-async def github_callback(code: str, state: str):
+async def github_callback(request: Request, code: str, state: str):
 
     # ---------------------VALIDATE STATE----------------------
     state_doc = await oauth_states.find_one({"state": state})
@@ -292,36 +294,30 @@ async def github_callback(code: str, state: str):
 
     # ---------------------Map GitHub identity to DailySync user----------------------
 
-    # Case 1: Existing user with this GitHub ID
-    user = await users.find_one({"github.github_id": github_id})
+    user = None
 
-    # Case 2: Existing user with this email
+    # Case 1: Logged-in user – attach GitHub to current session user
+    if request.state.user_id:
+        user = await users.find_one({"_id": ObjectId(request.state.user_id)})
+
+    # Case 2: Existing user with this GitHub ID
+    if not user:
+        user = await users.find_one({"github.github_id": github_id})
+
+    # Case 3: Existing user with this email
     if not user and primary_email:
         user = await users.find_one({"email": primary_email.lower()})
-        if user:
-            # Link GitHub account
-            await users.update_one(
-                {"_id": user["_id"]},
-                {"$set": {
-                    "github": {
-                        "github_id": github_id,
-                        "username": github_username,
-                        "avatar_url": avatar_url,
-                        "connected_at": datetime.now(timezone.utc),
-                    },
-                    "updated_at": datetime.now(timezone.utc),
-                }},
-            )
-    
-    # Case 3: New user
+
+    # Case 4: If still not found, create a new user from GitHub profile
     if not user:
         user_doc = {
             "fullName": gh_user.get("name") or github_username,
-            "email": primary_email or f"{github_id}@users.noreply.github.com",
+            "email": primary_email.lower() if primary_email else f"{github_id}@users.noreply.github.com",
             "password_hash": None,
             "github": {
                 "github_id": github_id,
                 "username": github_username,
+                "access_token": access_token,
                 "avatar_url": avatar_url,
                 "connected_at": datetime.now(timezone.utc),
             },
@@ -333,6 +329,21 @@ async def github_callback(code: str, state: str):
 
         insert_res = await users.insert_one(user_doc)
         user = {**user_doc, "_id": insert_res.inserted_id}
+
+    # Attach / update GitHub connection on the resolved user
+    await users.update_one(
+        {"_id": user["_id"]},
+        {"$set": {
+            "github": {
+                "github_id": github_id,
+                "username": github_username,
+                "access_token": access_token,
+                "avatar_url": avatar_url,
+                "connected_at": datetime.now(timezone.utc),
+            },
+            "updated_at": datetime.now(timezone.utc),
+        }},
+    )
 
     # ---------------------CREATE SESSION----------------------
     token = create_access_token(

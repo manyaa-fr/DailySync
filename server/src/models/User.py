@@ -6,9 +6,9 @@ from models.GithubAccount import GitHubAccount
 
 class User(BaseModel):
     id: Optional[str] = Field(alias="_id")
-    full_name: str
+    fullName: str
     email: EmailStr
-    password_hash: str
+    password_hash: Optional[str]
 
     github: Optional["GitHubAccount"] = None
 
