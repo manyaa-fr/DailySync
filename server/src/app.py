@@ -8,6 +8,7 @@ from Routes.AuthRoutes import github_router
 from middleware.AuthMiddleware import AuthMiddleware
 from Routes.Dashboard import router as get_dashboard
 from Routes.Github import router as manual_github_sync
+from Routes.TimeRoutes import router as time_router
 
 app = FastAPI()
 
@@ -29,3 +30,4 @@ app.include_router(auth_router)
 app.include_router(github_router)
 app.include_router(get_dashboard)
 app.include_router(manual_github_sync)
+app.include_router(time_router)
