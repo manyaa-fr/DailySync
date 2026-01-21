@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import { axiosClient } from "./utils/axiosClient";
 import { DashboardProvider } from "./context/Dashboard/DasboardProvider";
 import Github from "./pages/Github";
+import TimePage from "./pages/Time";
 
 export default function App(){
 
@@ -71,6 +72,14 @@ export default function App(){
                         element={
                         <DashboardProvider>
                             <Github />
+                        </DashboardProvider>
+                        }
+                    />
+                    <Route
+                        path="time"
+                        element={
+                        <DashboardProvider>
+                            <TimePage />
                         </DashboardProvider>
                         }
                     />

@@ -69,13 +69,13 @@ export const Input: React.FC<InputProps> = ({ label, className = '', ...props })
 );
 
 // BADGE COMPONENT
-interface BadgeProps {
+interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   children: React.ReactNode;
   variant?: 'success' | 'warning' | 'neutral' | 'outline' | 'primary' | 'pastel' | 'gold';
   className?: string;
 }
 
-export const Badge: React.FC<BadgeProps> = ({children, className = '', variant = 'neutral'}) => {
+export const Badge: React.FC<BadgeProps> = ({children, className = '', variant = 'neutral', ...props}) => {
     const styles = {
         success: "bg-secondary text-foreground border-border",
         warning: "bg-secondary text-foreground border-border",
@@ -87,7 +87,7 @@ export const Badge: React.FC<BadgeProps> = ({children, className = '', variant =
     };
 
     return (
-        <span className={`inline-flex items-center ... ${styles[variant]} ${className}`}>
+        <span className={`inline-flex items-center ... ${styles[variant]} ${className}`} {...props}>
             {children}
         </span>
     );
@@ -100,6 +100,34 @@ export const SectionTitle: React.FC<{ title: string; subtitle?: string }> = ({ t
     {subtitle && <p className="text-base text-muted-foreground mt-2 leading-relaxed">{subtitle}</p>}
   </div>
 );
+
+// MODAL COMPONENT
+interface ModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    title: string;
+    children: React.ReactNode;
+}
+
+export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
+    if (!isOpen) return null;
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-card w-full max-w-lg border border-border rounded-2xl shadow-xl p-6 relative animate-in zoom-in-95 duration-200">
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-semibold text-foreground tracking-tight">{title}</h3>
+                    <button 
+                        onClick={onClose} 
+                        className="text-muted-foreground hover:text-foreground transition-colors p-1 hover:bg-secondary rounded-lg"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 18 18"/></svg>
+                    </button>
+                </div>
+                {children}
+            </div>
+        </div>
+    );
+};
 
 // DEMO BANNER COMPONENT
 export const DemoBanner: React.FC = () => (
