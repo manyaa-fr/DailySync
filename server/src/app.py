@@ -13,7 +13,12 @@ from Routes.TimeRoutes import router as time_router
 app = FastAPI()
 
 # Middleware to handle CORS
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+# We merge env vars with hardcoded production domains to ensure it works out of the box
+env_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000")
+allowed_origins = list(set(env_origins.split(",") + [
+    "https://daily-sync-one.vercel.app",
+    "https://daily-sync-one.vercel.app/"
+]))
 
 app.add_middleware(
     CORSMiddleware,
