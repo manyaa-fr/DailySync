@@ -69,3 +69,24 @@ export const DEMO_DASHBOARD_DATA: DashboardData = {
     lastUpdated: '2026-01-09T00:00:00Z',
   },
 }
+
+export const MOCK_SUMMARIES = [
+   {
+      id: '1',
+      date: 'Yesterday',
+      mood: 'productive',
+      content: "You focused mainly on **dailysync-web**, resolving 3 UI bugs and setting up the new dashboard layout. You also reviewed 2 PRs from the team."
+   },
+   {
+      id: '2',
+      date: 'Jan 24',
+      mood: 'neutral',
+      content: "A slower day with 2 commits to **backend-api**. Spent most of the time debugging the authentication flow and researching OAuth providers."
+   },
+   {
+      id: '3',
+      date: 'Jan 23',
+      mood: 'productive',
+      content: "High activity! 8 commits across 3 repositories. You successfully refactored the database schema and updated all related API endpoints."
+   }
+];

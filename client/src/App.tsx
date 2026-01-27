@@ -13,6 +13,7 @@ import { axiosClient } from "./utils/axiosClient";
 import { DashboardProvider } from "./context/Dashboard/DasboardProvider";
 import Github from "./pages/Github";
 import TimePage from "./pages/Time";
+import SummaryPage from "./pages/Summary";
 
 export default function App(){
 
@@ -80,6 +81,14 @@ export default function App(){
                         element={
                         <DashboardProvider>
                             <TimePage />
+                        </DashboardProvider>
+                        }
+                    />
+                    <Route
+                        path="summary"
+                        element={
+                        <DashboardProvider>
+                            <SummaryPage />
                         </DashboardProvider>
                         }
                     />
