@@ -9,6 +9,8 @@ router = APIRouter(prefix="/api/v1/summary", tags=["summary"])
 github_snapshots = db["github_snapshots"]
 summaries_collection = db["summaries"]
 
+print("🚀 /summary/generate endpoint hit")
+
 
 # GET SUMMARIES (Paginated)
 @router.get("/")
@@ -58,13 +60,17 @@ async def generate_summary(request: Request):
         "created_at": {"$gte": start_of_day}
     })
 
-    if existing:
+    if existing and "(Offline Mode)" not in existing["content"]:
         return {
             "summary": existing["content"],
             "mood": existing.get("mood"),
             "stats": existing.get("stats", {}),
             "cached": True
         }
+    
+    # If regenerating (because it was offline mode), remove the old one to avoid duplicates
+    if existing:
+        await summaries_collection.delete_one({"_id": existing["_id"]})
 
     # 📦 Fetch GitHub snapshot
     snapshot = await github_snapshots.find_one({"user_id": ObjectId(user_id)})
@@ -88,18 +94,29 @@ async def generate_summary(request: Request):
 
     commits = [c for c in all_commits if is_recent(c)]
 
+    # If no recent commits, check if there are ANY commits in the snapshot
+    # This is useful for testing/demo if the user hasn't committed in 24h but wants to see the feature work
     if not commits:
-        return {"summary": "No commits made today yet. Go build something 🚀"}
+         # Fallback to recent 5 commits from history for demo purposes if no 24h activity
+         commits = all_commits[:5]
+    
+    if not commits:
+        return {"summary": "No commits found in your history. Go build something 🚀"}
 
     commit_count = len(commits)
-    repo_count = len(set(c.get("repo_name", "unknown") for c in commits))
+    
+    # Normalize repo name extraction
+    for c in commits:
+        c["repo_name"] = c.get("repo_name") or c.get("repo") or "unknown"
+
+    repo_count = len(set(c["repo_name"] for c in commits))
 
     ai_context = {
         "commit_count": commit_count,
         "repo_count": repo_count,
         "commits": [
             {
-                "repo": c.get("repo_name"),
+                "repo": c["repo_name"],
                 "message": c.get("message"),
                 "additions": c.get("additions"),
                 "deletions": c.get("deletions")
@@ -108,7 +125,9 @@ async def generate_summary(request: Request):
         ]
     }
 
+    print(f"🤖 Calling AI Service with {len(commits)} commits...")
     ai_result = await generate_ai_summary(ai_context)
+    print(f"🤖 AI Result: {bool(ai_result)}")
 
 
     # AI SUCCESS
@@ -119,24 +138,28 @@ async def generate_summary(request: Request):
         score = round((base_score * 0.6) + (ai_score * 0.4))
         score = max(1, min(score, 10))
 
-        summary = "## 🚀 Daily Progress Report\n\n"
-        summary += f"{ai_result.get('summary', '')}\n\n"
-
+        summary = f"## 🚀 Daily Progress Report\n\n"
+        summary += f"You made **{commit_count} commits** across **{repo_count} repositories**.\n\n"
         summary += "### ✨ Highlights\n"
         for h in ai_result.get("highlights", []):
             summary += f"- {h}\n"
 
-        if ai_result.get("gaps"):
-            summary += "\n### ⚠️ Gaps & Blockers\n"
-            for g in ai_result.get("gaps", []):
-                summary += f"- {g}\n"
+        if ai_result.get("insights"):
+            summary += "\n### 🧠 Insights\n"
+            for i in ai_result.get("insights", []):
+                summary += f"- {i}\n"
+
+        if ai_result.get("improvements"):
+            summary += "\n### 📈 Improvement Suggestion\n"
+            for imp in ai_result.get("improvements", []):
+                summary += f"- {imp}\n"
 
         summary += f"\n**Productivity Score:** {score}/10"
 
 
     # FALLBACK (No AI)
     else:
-        repos = set(c.get("repo", "unknown") for c in commits)
+        repos = set(c["repo_name"] for c in commits)
         repo_list = ", ".join(repos)
 
         summary = "## 🚀 Daily Progress Report (Offline Mode)\n\n"
@@ -144,7 +167,7 @@ async def generate_summary(request: Request):
 
         summary += "### 📋 Key Updates\n"
         for c in commits[:5]:
-            summary += f"- **{c.get('repo','unknown')}**: {c.get('message','Update')}\n"
+            summary += f"- **{c['repo_name']}**: {c.get('message','Update')}\n"
 
         if commit_count > 5:
             summary += f"\n*...and {commit_count - 5} more updates.*\n"

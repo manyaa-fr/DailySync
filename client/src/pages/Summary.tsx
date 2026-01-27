@@ -5,9 +5,24 @@ import { axiosClient } from '../utils/axiosClient';
 import { MOCK_SUMMARIES } from '../mock/demoDashboard';
 import { useSearchParams } from 'react-router-dom';
 
-const ReactMarkdown = ({ children }: { children: string }) => (
-  <div dangerouslySetInnerHTML={{ __html: children.replace(/\n/g, '<br />') }} />
-);
+const ReactMarkdown = ({ children }: { children: string }) => {
+    // Basic Markdown parser for headings, bold, lists
+    const html = children
+        // Headers
+        .replace(/^### (.*$)/gim, '<h3 class="text-lg font-bold mt-4 mb-2 text-foreground">$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2 class="text-xl font-bold mt-6 mb-3 text-foreground border-b border-border pb-2">$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1 class="text-2xl font-bold mt-6 mb-4 text-foreground">$1</h1>')
+        // Bold
+        .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-semibold text-foreground">$1</strong>')
+        // Italic
+        .replace(/\*(.*?)\*/gim, '<em class="italic">$1</em>')
+        // Unordered Lists
+        .replace(/^\s*-\s+(.*$)/gim, '<li class="ml-4 list-disc pl-1 text-muted-foreground">$1</li>')
+        // Line breaks
+        .replace(/\n/g, '<br />');
+
+    return <div dangerouslySetInnerHTML={{ __html: html }} />;
+};
 export default function SummaryPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentSummary, setCurrentSummary] = useState<string | null>(null);
