@@ -102,8 +102,6 @@ async def register(payload: RegisterRequest):
         "password_hash": password_hash,
         "created_at": datetime.now(timezone.utc),
         "updated_at": datetime.now(timezone.utc),
-
-
     }
 
     res = await users.insert_one(user)
@@ -120,10 +118,6 @@ async def register(payload: RegisterRequest):
             "success": True,
         }
     )
-
-
-
-
 
     set_auth_cookie(
         response,
@@ -162,14 +156,11 @@ async def login(payload: LoginRequest):
         }
     )
 
-
     set_auth_cookie(
         response,
         token,
         access_token_expire_minutes * 60,
-
     )
-
     return response
 
 
@@ -205,8 +196,6 @@ async def me(request: Request):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found",
         )
-
-
 
     return {
         "id": str(user["_id"]),
