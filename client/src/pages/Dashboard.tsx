@@ -21,7 +21,8 @@ import {
   Zap, 
   ArrowUpRight, 
   GitBranch,  
-  Sparkles
+  Sparkles,
+  RefreshCw,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Card, Badge, Button } from '../components/ui/UIComponents';
@@ -445,12 +446,15 @@ const weeklyChartData = (data.weeklyActivity ?? []).map(d => ({
               <Clock size={16} /> Log Coding Time
            </Button>
         </NavLink>
-        <button
+        <Button
           onClick={refreshGithub}
           disabled={refreshing}
+          variant="outline"
+          className="gap-2 h-12"
         >
-          {refreshing ? 'Refreshing…' : 'Refresh GitHub'}
-        </button>
+          <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+          {refreshing ? 'Syncing...' : 'Refresh GitHub'}
+        </Button>
         <NavLink to="/app/aiinsight">
            <Button variant="outline" className="gap-2 h-12">
               <Sparkles size={16} /> Generate AI Summary

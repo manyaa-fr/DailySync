@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {Outlet, NavLink, useLocation} from 'react-router-dom';
 import {motion, AnimatePresence} from 'framer-motion';
 import {
@@ -16,9 +16,20 @@ import {
     Moon
 } from 'lucide-react';
 import { useTheme } from "../context/Theme/useTheme";
+import { useAuth } from "../auth/useAuth";
+import { axiosClient } from "../utils/axiosClient";
 import { DemoBanner } from "./ui/UIComponents";
+import type { UserProfile } from "../types/User";
 
-const SidebarContent = ({onClose, navItems }) => (
+interface SidebarContentProps {
+  onClose: (open: boolean) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  navItems: Array<{ icon: React.ComponentType<any>; label: string; path: string }>;
+  user: UserProfile | null;
+  onLogout: () => Promise<void>;
+}
+
+const SidebarContent = ({ onClose, navItems, user, onLogout }: SidebarContentProps) => (
 <div className="flex flex-col h-full bg-card border-r border-border">
     <div className="p-6 flex items-center gap-3">
         <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-sm">
@@ -50,24 +61,43 @@ const SidebarContent = ({onClose, navItems }) => (
     <div className="p-4 border-t border-border">
         <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary transition-colors cursor-pointer group">
             <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 text-xs font-bold ring-1 ring-border">
-                JD
+                {user?.fullName ? user.fullName.split(' ').map((n) => n[0]).join('').toUpperCase() : 'U'}
             </div>
             <div className="flex-1 overflow-hidden">
-                <p className="text-sm font-medium truncate text-foreground">Jane Developer</p>
-                <p className="text-xs text-muted-foreground truncate">jane@example.com</p>
+                <p className="text-sm font-medium truncate text-foreground">{user?.fullName || 'User'}</p>
+                <p className="text-xs text-muted-foreground truncate">{user?.email || 'Loading...'}</p>
             </div>
-            <NavLink to="/" title="Logout">
+            <button onClick={onLogout} title="Logout" className="p-1">
                 <LogOut size={16} className="text-muted-foreground hover:text-foreground group-hover:translate-x-0.5 transition-all" />
-            </NavLink>
+            </button>
         </div>
     </div>
 </div>
 );
 export default function LayoutShell(){
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [user, setUser] = useState<UserProfile | null>(null);
     const { theme, toggleTheme } = useTheme();
+    const { logout } = useAuth();
     const location = useLocation();
     const isDemo = location.pathname.includes('/demo');
+
+    // Fetch user profile data
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await axiosClient.get('/user/profile');
+                setUser(response.data);
+            } catch (error) {
+                console.error('Failed to fetch user profile:', error);
+            }
+        };
+        fetchUser();
+    }, []);
+
+    const handleLogout = async () => {
+        await logout();
+    };
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: isDemo ? '/demo' : '/app/dashboard' },
@@ -116,6 +146,8 @@ export default function LayoutShell(){
                         <SidebarContent
                             onClose={() => setIsMobileMenuOpen(false)}
                             navItems = {navItems}
+                            user={user}
+                            onLogout={handleLogout}
                         />
                         <button 
                             onClick={() => setIsMobileMenuOpen(false)}
@@ -131,6 +163,8 @@ export default function LayoutShell(){
         {/* Desktop Sidebar */}
             <div className="hidden md:block w-64 h-screen sticky top-0 z-30">
                 <SidebarContent
+                    user={user}
+                    onLogout={handleLogout}
                     onClose={() => setIsMobileMenuOpen(false)}
                     navItems = {navItems}
                 />

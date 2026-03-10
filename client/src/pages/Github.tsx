@@ -21,6 +21,7 @@ import {
   Flame,
   BrainCircuit,
   Clock,
+  RefreshCw,
 } from 'lucide-react';
 import { Card, Badge, SectionTitle, Button } from '../components/ui/UIComponents';
 import { useDashboard } from '../context/Dashboard/UseDashboard';
@@ -135,7 +136,13 @@ export default function GithubPage() {
     <div className="space-y-8">
       {/* 1. Header and Quick Stats */}
       <div>
-        <SectionTitle title="GitHub Intelligence" subtitle="Deep dive into your contribution patterns and code quality." />
+        <div className="flex items-center justify-between">
+            <SectionTitle title="GitHub Intelligence" subtitle="Deep dive into your contribution patterns and code quality." />
+            <Button onClick={refreshGithub} disabled={refreshing} variant="outline" className="gap-2">
+                <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+                {refreshing ? 'Syncing...' : 'Sync Data'}
+            </Button>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
            <MetricStat
              icon={GitCommit}

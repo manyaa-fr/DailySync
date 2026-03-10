@@ -14,6 +14,8 @@ import { DashboardProvider } from "./context/Dashboard/DasboardProvider";
 import Github from "./pages/Github";
 import TimePage from "./pages/Time";
 import SummaryPage from "./pages/Summary";
+import ProfilePage from "./pages/Profile";
+import SettingsPage from "./pages/Settings";
 
 export default function App(){
 
@@ -92,6 +94,8 @@ export default function App(){
                         </DashboardProvider>
                         }
                     />
+                    <Route path="profile" element={<ProfilePage />} />
+                    <Route path="settings" element={<SettingsPage />} />
                     <Route index element={<Navigate to="dashboard" replace />} />
                     </Route>
                 </Routes>
