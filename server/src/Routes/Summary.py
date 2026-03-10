@@ -9,8 +9,6 @@ router = APIRouter(prefix="/api/v1/summary", tags=["summary"])
 github_snapshots = db["github_snapshots"]
 summaries_collection = db["summaries"]
 
-print("🚀 /summary/generate endpoint hit")
-
 
 # GET SUMMARIES (Paginated)
 @router.get("/")
@@ -125,9 +123,7 @@ async def generate_summary(request: Request):
         ]
     }
 
-    print(f"🤖 Calling AI Service with {len(commits)} commits...")
     ai_result = await generate_ai_summary(ai_context)
-    print(f"🤖 AI Result: {bool(ai_result)}")
 
 
     # AI SUCCESS

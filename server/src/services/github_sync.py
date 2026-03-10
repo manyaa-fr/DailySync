@@ -10,7 +10,7 @@ from models.github_snapshots import (
 
 GITHUB_API_BASE = "https://api.github.com"
 SYNC_LOOKBACK_DAYS = 90
-MAX_REPOS = 50          # safety cap
+MAX_REPOS = 100          # safety cap
 MAX_COMMITS_PER_REPO = 100  # safety cap
 users = db["user"]
 github_snapshots = db["github_snapshots"]
@@ -49,11 +49,17 @@ async def sync_github_snapshot(user_id: ObjectId) -> None:
     # --------------------------------------------------
     # 2. Fetch repositories
     # --------------------------------------------------
-    async with httpx.AsyncClient(timeout=20) as client:
+    
+    async with httpx.AsyncClient(timeout=30) as client:
         repo_res = await client.get(
             f"{GITHUB_API_BASE}/user/repos",
             headers=headers,
-            params={"per_page": MAX_REPOS},
+            params={
+                "per_page": MAX_REPOS,
+                "sort": "pushed",
+                "direction": "desc",
+                "type": "all"
+            },
         )
         if repo_res.status_code == 401:
             # Token revoked or expired
@@ -106,8 +112,13 @@ async def sync_github_snapshot(user_id: ObjectId) -> None:
 
             if commits_res.status_code != 200:
                 continue
+            
+            commits_data = commits_res.json()
+            if not commits_data:
+                continue
+                
 
-            for c in commits_res.json():
+            for c in commits_data:
                 gh_author = c.get("author")
                 commit_data = c.get("commit", {})
                 commit_author = commit_data.get("author")
@@ -129,6 +140,7 @@ async def sync_github_snapshot(user_id: ObjectId) -> None:
                 )
 
                 if not (matches_login or matches_email):
+                    # print(f"    Skipping commit {c['sha'][:7]} (Login: {gh_author.get('login') if gh_author else 'None'}, Email: {author_email})")
                     continue
 
                 sha = c["sha"]
@@ -173,6 +185,72 @@ async def sync_github_snapshot(user_id: ObjectId) -> None:
                         deletions=deletions,
                     )
                 )
+
+        # --------------------------------------------------
+        # 3. Fetch recent events (to catch branch commits & org repos)
+        # --------------------------------------------------
+        events_res = await client.get(
+            f"{GITHUB_API_BASE}/users/{user['github']['username']}/events",
+            headers=headers,
+            params={"per_page": 100}
+        )
+        
+        if events_res.status_code == 200:
+            events = events_res.json()
+            existing_shas = {c.sha for c in commits}
+            
+            for event in events:
+                if event["type"] == "PushEvent":
+                    repo_name = event["repo"]["name"]  # e.g. "user/repo"
+                    repo_id = event["repo"]["id"]
+                    created_at = datetime.fromisoformat(event["created_at"].replace("Z", "+00:00"))
+                    
+                    # Check if this repo is already in our repos list
+                    # If not, we might want to add it (or just track the commit)
+                    # For now, just track the commit
+                    
+                    for payload_commit in event["payload"].get("commits", []):
+                        sha = payload_commit["sha"]
+                        if sha in existing_shas:
+                            continue
+                            
+                        # Fetch stats for this commit
+                        additions = None
+                        deletions = None
+                        try:
+                            detail_res = await client.get(
+                                f"{GITHUB_API_BASE}/repos/{repo_name}/commits/{sha}",
+                                headers=headers
+                            )
+                            if detail_res.status_code == 200:
+                                d = detail_res.json()
+                                stats = d.get("stats", {})
+                                additions = stats.get("additions")
+                                deletions = stats.get("deletions")
+                                
+                                # Also get the correct date from the commit detail
+                                # The event date is the push time, commit date might be different
+                                if d.get("commit") and d["commit"].get("author"):
+                                    c_date = d["commit"]["author"]["date"]
+                                    created_at = datetime.fromisoformat(c_date.replace("Z", "+00:00"))
+                        except Exception:
+                            pass
+                            
+                        commits.append(
+                            GitHubCommitSnapshot(
+                                repo_id=repo_id,
+                                repo_name=repo_name.split("/")[-1], # store just the name part to match others? 
+                                                                   # Wait, existing logic uses repo["name"] which is just "DailySync"? 
+                                                                   # No, GitHub API "name" is "DailySync", "full_name" is "manyaa-fr/DailySync"
+                                                                   # event["repo"]["name"] is "manyaa-fr/DailySync" (full name)
+                                sha=sha,
+                                message=payload_commit["message"],
+                                committed_at=created_at,
+                                additions=additions,
+                                deletions=deletions
+                            )
+                        )
+                        existing_shas.add(sha)
 
     # --------------------------------------------------
     # 4. Upsert snapshot (atomic replace)

@@ -8,3 +8,8 @@ class RegisterRequest(BaseModel):
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
+
+class PasswordChangeRequest(BaseModel):
+    old_password: str
+    new_password: str
+    confirm_password: str
