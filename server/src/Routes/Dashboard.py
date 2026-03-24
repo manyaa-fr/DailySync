@@ -11,11 +11,18 @@ from services.dashboard_metrics import (
     compute_coding_time,
     compute_code_churn,
 )
+from services.etl_sessions import parse_iso_datetime
+from services.predictor import (
+    DayFeatures,
+    build_predictive_ai_insight,
+    predict_tomorrow_numbers,
+)
 
 router = APIRouter(prefix="/api/v1", tags=["dashboard"])
 STALE_AFTER = timedelta(hours=6)
 users = db["user"]
 github_snapshots = db["github_snapshots"]
+time_logs_collection = db["time_logs"]
 
 
 def format_last_active(dt: Optional[datetime]) -> str:
@@ -181,6 +188,94 @@ async def get_dashboard(request: Request):
         reverse=True,
     )[:5]
 
+    # -------------------------
+    # Predictive productivity
+    # -------------------------
+    ai_insight = None
+    try:
+        now_utc = datetime.now(timezone.utc)
+        history_start_day = (now_utc.date() - timedelta(days=13)).isoformat()
+        history_days = [
+            (now_utc.date() - timedelta(days=13 - i)).isoformat()
+            for i in range(14)
+        ]
+
+        # Focus-time history (from normalized `time_logs` records).
+        cursor = (
+            time_logs_collection.find(
+                {
+                    "user_id": ObjectId(user_id),
+                    "date": {"$gte": history_start_day},
+                }
+            )
+            .sort("date", -1)
+            .limit(500)
+        )
+        recent_time_logs_docs = await cursor.to_list(length=500)
+
+        daily_focus = {
+            d: {"deepwork_minutes": 0, "deepwork_sessions": 0} for d in history_days
+        }
+        peak_hour_counts: dict[int, int] = {}
+
+        for log in recent_time_logs_docs:
+            day = log.get("date")
+            if day not in daily_focus:
+                continue
+
+            minutes = int(log.get("minutes") or 0)
+            is_deep = bool(log.get("isDeepWork", False))
+
+            if is_deep:
+                daily_focus[day]["deepwork_minutes"] += minutes
+                daily_focus[day]["deepwork_sessions"] += 1
+
+                session_start = parse_iso_datetime(log.get("startTime"))
+                if session_start:
+                    peak_hour_counts[session_start.hour] = (
+                        peak_hour_counts.get(session_start.hour, 0) + 1
+                    )
+
+        peak_hour = (
+            max(peak_hour_counts, key=lambda h: peak_hour_counts[h])
+            if peak_hour_counts
+            else None
+        )
+        peak_hour_label = f"{peak_hour:02d}:00" if peak_hour is not None else None
+
+        # Code-activity history (from normalized GitHub commit timestamps).
+        commit_counts = {d: 0 for d in history_days}
+        for c in normalized_commits:
+            dt = c["date"]
+            day = dt.date().isoformat()
+            if day in commit_counts:
+                commit_counts[day] += 1
+
+        features = [
+            DayFeatures(
+                day=d,
+                deepwork_minutes=daily_focus[d]["deepwork_minutes"],
+                deepwork_sessions=daily_focus[d]["deepwork_sessions"],
+                commit_count=commit_counts[d],
+            )
+            for d in history_days
+        ]
+
+        deepwork_minutes_last7 = sum(f.deepwork_minutes for f in features[-7:])
+        deepwork_sessions_last7 = sum(f.deepwork_sessions for f in features[-7:])
+
+        # Only show predictions once we have enough focus sessions.
+        if deepwork_sessions_last7 >= 4 or deepwork_minutes_last7 >= 120:
+            prediction = predict_tomorrow_numbers(features)
+            ai_insight = build_predictive_ai_insight(
+                history_days=features,
+                prediction=prediction,
+                peak_focus_hour_label=peak_hour_label,
+            )
+    except Exception:
+        # Prediction should never break the core dashboard experience.
+        ai_insight = None
+
     language_totals = snapshot.get("languages") or {}
     language_items = list(language_totals.items()) if isinstance(language_totals, dict) else []
     total_lines = sum(int(v) for _, v in language_items) or 0
@@ -256,7 +351,7 @@ async def get_dashboard(request: Request):
             ],
         },
         "codingTime": coding_time,
-        "aiInsight": None,
+        "aiInsight": ai_insight,
         "languages": languages,
         "primaryLanguage": primary_language,
         "repos": repos,

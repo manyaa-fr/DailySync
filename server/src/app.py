@@ -17,6 +17,8 @@ from Routes.Dashboard import router as get_dashboard
 from Routes.Github import router as manual_github_sync
 from Routes.Summary import router as summary_router
 from Routes.TimeRoutes import router as time_router
+from Routes.Insights import router as insights_router
+from Routes.Analytics import router as analytics_router
 from config.db import db
 
 app = FastAPI()
@@ -50,3 +52,5 @@ app.include_router(get_dashboard)
 app.include_router(manual_github_sync)
 app.include_router(summary_router)
 app.include_router(time_router)
+app.include_router(insights_router)
+app.include_router(analytics_router)
