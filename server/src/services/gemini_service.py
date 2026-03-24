@@ -21,10 +21,10 @@ async def generate_ai_summary(context_data: dict) -> dict:
 
     # List of models to try in order of preference/availability
     models = [
-        "gemini-2.5-flash",
+        "gemini-2.0-flash-001",
         "gemini-2.0-flash-lite-preview-02-05",
-        "gemini-flash-latest",
-        "gemini-1.5-flash"
+        "gemini-1.5-flash",
+        "gemini-1.5-flash-latest",
     ]
 
     print(f"DEBUG: Generating AI summary with key ending in ...{api_key[-4:]}")

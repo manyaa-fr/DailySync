@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from collections import defaultdict
 
 
@@ -23,15 +23,27 @@ def compute_weekly_activity(commits):
 
 
 def compute_streak(commit_dates):
+    if not commit_dates:
+        return 0
+
     unique_days = sorted({d.date() for d in commit_dates}, reverse=True)
 
     streak = 0
-    today = datetime.utcnow().date()
+    today = datetime.now(timezone.utc).date()
+    
+    # If the user hasn't committed today or yesterday, the streak is broken
+    if unique_days[0] < today - timedelta(days=1):
+        return 0
 
-    for i, d in enumerate(unique_days):
-        if d == today - timedelta(days=i):
+    # Start checking from the last day they committed
+    current_check = unique_days[0]
+    
+    for d in unique_days:
+        if d == current_check:
             streak += 1
+            current_check -= timedelta(days=1)
         else:
+            # Gap in commits
             break
 
     return streak
@@ -44,12 +56,14 @@ def compute_coding_time(commits):
         hour = c["date"].hour
         hourly[hour] += 1
 
+    # Compute peak BEFORE building hourly_data (building it would auto-create
+    # keys 0-23 in the defaultdict, making max() return 0 even for empty commits)
+    peak = max(hourly, key=lambda h: hourly[h], default=None) if hourly else None
+
     hourly_data = [
-        {"name": f"{h:02d}", "value": hourly[h] * 30}
+        {"name": f"{h:02d}", "value": hourly.get(h, 0) * 30}
         for h in range(24)
     ]
-
-    peak = max(hourly, key=lambda h: hourly[h], default=None)
 
     return {
         "hourly": hourly_data,
