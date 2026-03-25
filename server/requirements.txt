@@ -16,3 +16,9 @@ httpx
 
 python-multipart
 pydantic[email]
+
+# Testing
+pytest
+pytest-asyncio
+pytest-mock
+mongomock-motor
