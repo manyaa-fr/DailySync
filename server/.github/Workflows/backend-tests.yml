@@ -1,0 +1,46 @@
+name: Backend Regression Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        cd server
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-asyncio pytest-mock mongomock-motor httpx
+
+    - name: Run Pytest
+      run: |
+        cd server
+        # We set dummy env vars for the CI runner
+        export JWT_SECRET_KEY=ci-test-secret
+        export GITHUB_CLIENT_ID=ci-id
+        export GITHUB_CLIENT_SECRET=ci-secret
+        export GITHUB_REDIRECT_URI=http://localhost:8000/callback
+        export DB_NAME=test_db
+        export MONGODB_URI=mongodb://localhost:27017
+        export API_KEY=ci-api-key
+        export PYTHONPATH=$PYTHONPATH:$(pwd)/src
+        pytest tests/

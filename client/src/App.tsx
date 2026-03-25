@@ -11,6 +11,7 @@ import {Register} from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import { axiosClient } from "./utils/axiosClient";
 import { DashboardProvider } from "./context/Dashboard/DasboardProvider";
+import { AuthProvider } from "./auth/AuthProvider";
 import Github from "./pages/Github";
 import TimePage from "./pages/Time";
 import SummaryPage from "./pages/Summary";
@@ -52,54 +53,56 @@ export default function App(){
 
     return (
         <ThemeProvider>
-            <BrowserRouter>
-                <Routes>
-                    <Route path="/" element={<Landing />} />
-                    <Route path="/features" element={<Features />} />
-                    <Route path="/pricing" element={<PricingPage />} />
-                    <Route path="/layout" element={<LayoutShell />} />
-                    <Route path="/auth/login" element={<Login />} />
-                    <Route path="/auth/register" element={<Register />} />
-                    <Route path="*" element={<Navigate to="/" replace />} />    
-                    <Route path="/app" element={<LayoutShell />}>
-                    <Route
-                        path="dashboard"
-                        element={
-                        <DashboardProvider>
-                            <Dashboard />
-                        </DashboardProvider>
-                        }
-                    />
-                    <Route
-                        path="github"
-                        element={
-                        <DashboardProvider>
-                            <Github />
-                        </DashboardProvider>
-                        }
-                    />
-                    <Route
-                        path="time"
-                        element={
-                        <DashboardProvider>
-                            <TimePage />
-                        </DashboardProvider>
-                        }
-                    />
-                    <Route
-                        path="summary"
-                        element={
-                        <DashboardProvider>
-                            <SummaryPage />
-                        </DashboardProvider>
-                        }
-                    />
-                    <Route path="profile" element={<ProfilePage />} />
-                    <Route path="settings" element={<SettingsPage />} />
-                    <Route index element={<Navigate to="dashboard" replace />} />
-                    </Route>
-                </Routes>
-            </BrowserRouter>
+            <AuthProvider>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="/" element={<Landing />} />
+                        <Route path="/features" element={<Features />} />
+                        <Route path="/pricing" element={<PricingPage />} />
+                        <Route path="/layout" element={<LayoutShell />} />
+                        <Route path="/auth/login" element={<Login />} />
+                        <Route path="/auth/register" element={<Register />} />
+                        <Route path="*" element={<Navigate to="/" replace />} />    
+                        <Route path="/app" element={<LayoutShell />}>
+                        <Route
+                            path="dashboard"
+                            element={
+                            <DashboardProvider>
+                                <Dashboard />
+                            </DashboardProvider>
+                            }
+                        />
+                        <Route
+                            path="github"
+                            element={
+                            <DashboardProvider>
+                                <Github />
+                            </DashboardProvider>
+                            }
+                        />
+                        <Route
+                            path="time"
+                            element={
+                            <DashboardProvider>
+                                <TimePage />
+                            </DashboardProvider>
+                            }
+                        />
+                        <Route
+                            path="summary"
+                            element={
+                            <DashboardProvider>
+                                <SummaryPage />
+                            </DashboardProvider>
+                            }
+                        />
+                        <Route path="profile" element={<ProfilePage />} />
+                        <Route path="settings" element={<SettingsPage />} />
+                        <Route index element={<Navigate to="dashboard" replace />} />
+                        </Route>
+                    </Routes>
+                </BrowserRouter>
+            </AuthProvider>
         </ThemeProvider>
     );
 }

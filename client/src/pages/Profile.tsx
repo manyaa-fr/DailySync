@@ -12,12 +12,12 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { Card, SectionTitle, Badge } from '../components/ui/UIComponents';
-// import { useAuth } from '../auth/useAuth';
+import { useAuth } from '../auth/useAuth';
 import {axiosClient} from '../utils/axiosClient';
 import type { UserProfile } from '../types/User';
 
 export default function ProfilePage() {
-//   const { user: authUser, logout } = useAuth();
+  useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
